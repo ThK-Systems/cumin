@@ -1,6 +1,6 @@
 # cumin
 
-cumin provides some utility classes for java (standard edition): \[tabby title="Overview"\]
+cumin provides some utility classes for java (standard edition):
 
 ## Overview
 
