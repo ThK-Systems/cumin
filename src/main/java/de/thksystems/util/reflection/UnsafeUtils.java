@@ -14,20 +14,20 @@ import sun.misc.Unsafe;
 @SuppressWarnings("restriction")
 public final class UnsafeUtils {
 
-	private UnsafeUtils() {
-	}
+    private UnsafeUtils() {
+    }
 
-	/**
-	 * Gets the internal Unsafe class.
-	 */
-	public static Unsafe getUnsafe() {
-		try {
-			Field unsafeField = Unsafe.class.getDeclaredField("theUnsafe");
-			unsafeField.setAccessible(true);
-			return (Unsafe) unsafeField.get(null);
-		} catch (IllegalAccessException | NoSuchFieldException | SecurityException e) {
-			return null;
-		}
-	}
+    /**
+     * Gets the internal Unsafe class.
+     */
+    public static Unsafe getUnsafe() {
+        try {
+            Field unsafeField = Unsafe.class.getDeclaredField("theUnsafe");
+            unsafeField.setAccessible(true);
+            return (Unsafe) unsafeField.get(null);
+        } catch (IllegalAccessException | NoSuchFieldException | SecurityException e) {
+            return null;
+        }
+    }
 
 }

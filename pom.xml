@@ -1,73 +1,73 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>net.thk-systems.commons</groupId>
-	<artifactId>cumin</artifactId>
-	<packaging>jar</packaging>
-	<version>3.13.0</version>
-	<name>cumin</name>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>net.thk-systems.commons</groupId>
+    <artifactId>cumin</artifactId>
+    <packaging>jar</packaging>
+    <version>3.13.0</version>
+    <name>cumin</name>
 
-	<parent>
-		<groupId>net.thk-systems</groupId>
-		<artifactId>tksparent</artifactId>
-		<version>1.17.0</version>
-	</parent>
+    <parent>
+        <groupId>net.thk-systems</groupId>
+        <artifactId>tksparent</artifactId>
+        <version>1.17.0</version>
+    </parent>
 
-	<dependencies>
-		<!-- TEST -->
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-		</dependency>
+    <dependencies>
+        <!-- TEST -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
 
-		<!-- OTHER COMMONS -->
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-text</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>commons-codec</groupId>
-			<artifactId>commons-codec</artifactId>
-		</dependency>
-		
-		<!-- ICU (only provided) -->
-		<dependency>
-			<groupId>com.ibm.icu</groupId>
-			<artifactId>icu4j</artifactId>
-			<scope>provided</scope>
-		</dependency>
+        <!-- OTHER COMMONS -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-text</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+        </dependency>
 
-		<!-- BOUNCY CASTLE (runtime) -->
-		<dependency>
-			<groupId>org.bouncycastle</groupId>
-			<artifactId>bcprov-jdk16</artifactId>
-			<scope>runtime</scope>
-		</dependency>
+        <!-- ICU (only provided) -->
+        <dependency>
+            <groupId>com.ibm.icu</groupId>
+            <artifactId>icu4j</artifactId>
+            <scope>provided</scope>
+        </dependency>
 
-		<!-- LOGGING  -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-		</dependency>
-		<!-- LOGGING (runtime) -->
-		<dependency>
-			<groupId>ch.qos.logback</groupId>
-			<artifactId>logback-classic</artifactId>
-			<scope>runtime</scope>
-		</dependency>
+        <!-- BOUNCY CASTLE (runtime) -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk16</artifactId>
+            <scope>runtime</scope>
+        </dependency>
 
-	</dependencies>
+        <!-- LOGGING  -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <!-- LOGGING (runtime) -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <scope>runtime</scope>
+        </dependency>
 
-	<description>Commons for lang, crypto, xml, dom, text, csv, reflection, annotations, parsing, ...</description>
+    </dependencies>
 
-	<url>http://oss.thk-systems.de/?page_id=40</url>
+    <description>Commons for lang, crypto, xml, dom, text, csv, reflection, annotations, parsing, ...</description>
+
+    <url>http://oss.thk-systems.de/?page_id=40</url>
 </project>

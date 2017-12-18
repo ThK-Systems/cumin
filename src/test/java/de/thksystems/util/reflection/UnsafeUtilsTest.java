@@ -6,9 +6,9 @@ import org.junit.Test;
 
 public class UnsafeUtilsTest {
 
-	@Test
-	public void testGetUnsafe() {
-		assertNotNull(UnsafeUtils.getUnsafe());
-	}
+    @Test
+    public void testGetUnsafe() {
+        assertNotNull(UnsafeUtils.getUnsafe());
+    }
 
 }

@@ -6,10 +6,10 @@ import org.junit.Test;
 
 public class RandomStringUtilsTest {
 
-	@Test
-	public void testRandomAlphanumeric() {
-		String s = RandomStringUtils.randomAlphanumeric(20);
-		assertEquals(20, s.length());
-	}
+    @Test
+    public void testRandomAlphanumeric() {
+        String s = RandomStringUtils.randomAlphanumeric(20);
+        assertEquals(20, s.length());
+    }
 
 }

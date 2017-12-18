@@ -1,6 +1,6 @@
 /*
  * tksCommons
- * 
+ *
  * Author  : Thomas Kuhlmann (ThK-Systems, http://www.thk-systems.de)
  * License : LGPL (https://www.gnu.org/licenses/lgpl.html)
  */
@@ -19,161 +19,161 @@ import org.junit.Test;
 
 public class LockerTest {
 
-	private final class Thread1 extends Thread {
-		private final Locker<String> tl;
+    @Test
+    public void testLockAndUnlock() throws Exception {
+        final Locker<String> locker = new Locker<String>();
 
-		Boolean result = null;
+        locker.lock("LOCKME");
+        assertFalse(locker.isLocked("LOCKME"));
+        assertTrue(locker.isHeldByCurrentThread("LOCKME"));
 
-		private Thread1(Locker<String> tl) {
-			this.tl = tl;
-		}
+        Thread1 thread1 = new Thread1(locker);
+        thread1.start();
+        thread1.join();
+        assertTrue(thread1.result);
 
-		@Override
-		public void run() {
-			try {
-				tl.unlock("LOCKME");
-				tl.lock("LOCK2");
-				tl.lock("LOCK2");
-				tl.lock("LOCK2");
-				tl.unlock("LOCK2");
-				tl.unlock("LOCK2");
-				tl.unlock("LOCK2");
-				tl.lock("LOCKME", 1L);
-				result = false;
-			} catch (TimeoutException e) {
-				result = true;
-			}
-		}
-	}
+        locker.unlock("LOCKME");
+        assertFalse(locker.isLocked("LOCKME"));
+        assertFalse(locker.isHeldByCurrentThread("LOCKME"));
 
-	private final class Thread2 extends Thread {
-		private final Locker<String> locker;
+        Thread2 thread2 = new Thread2(locker);
+        thread2.start();
+        thread2.join();
+        assertTrue(thread2.result);
 
-		Boolean result = null;
+    }
 
-		private Thread2(Locker<String> locker) {
-			this.locker = locker;
-		}
+    @Test
+    public void testLockCount() throws Exception {
+        final Locker<BigDecimal> locker = new Locker<BigDecimal>();
+        BigDecimal bd = new BigDecimal("1500");
 
-		@Override
-		public void run() {
-			locker.lock("LOCKME");
-			result = true;
-			locker.unlock("LOCKME");
-		}
-	}
+        locker.lock(bd);
+        locker.lock(bd);
+        assertTrue(locker.isHeldByCurrentThread(bd));
 
-	@Test
-	public void testLockAndUnlock() throws Exception {
-		final Locker<String> locker = new Locker<String>();
+        locker.unlock(bd);
+        assertTrue(locker.isHeldByCurrentThread(bd));
 
-		locker.lock("LOCKME");
-		assertFalse(locker.isLocked("LOCKME"));
-		assertTrue(locker.isHeldByCurrentThread("LOCKME"));
+        locker.unlock(bd);
+        assertFalse(locker.isHeldByCurrentThread(bd));
+    }
 
-		Thread1 thread1 = new Thread1(locker);
-		thread1.start();
-		thread1.join();
-		assertTrue(thread1.result);
+    @Test
+    public void testLockOrder() throws Exception {
+        final Locker<String> locker = new Locker<String>();
 
-		locker.unlock("LOCKME");
-		assertFalse(locker.isLocked("LOCKME"));
-		assertFalse(locker.isHeldByCurrentThread("LOCKME"));
+        ThreadQueued[] threads = new ThreadQueued[10];
+        for (int i = 0; i < 10; i++) {
+            threads[i] = new ThreadQueued(locker);
+            threads[i].start();
+            Thread.sleep(50);
+        }
 
-		Thread2 thread2 = new Thread2(locker);
-		thread2.start();
-		thread2.join();
-		assertTrue(thread2.result);
+        for (int i = 0; i < 10; i++) {
+            assertTrue(String.valueOf(i), threads[i].isRunning);
+            threads[i].runme = false;
+            threads[i].join();
+            Thread.sleep(50);
+        }
+    }
 
-	}
+    @Test
+    public void testExecuteWithLock() throws Exception {
+        Locker<String> locker = new Locker<>();
+        String elem = "LOCKME";
+        locker.lock(elem);
+        // ... with Runnable
+        locker.executeWithLock(elem, () -> System.out.println("Hello: " + elem));
+        // ... with Supplier
+        long result = locker.executeWithLock(elem, () -> 5L);
+        assertEquals(5L, result);
+        assertTrue(locker.isHeldByCurrentThread(elem));
+    }
 
-	@Test
-	public void testLockCount() throws Exception {
-		final Locker<BigDecimal> locker = new Locker<BigDecimal>();
-		BigDecimal bd = new BigDecimal("1500");
+    @Test
+    @Ignore
+    public void testWithGarbageCollection() throws Exception {
+        Locker<String> locker = new Locker<>();
+        String elem = "LOCKME" + System.currentTimeMillis();
+        locker.lock(elem);
 
-		locker.lock(bd);
-		locker.lock(bd);
-		assertTrue(locker.isHeldByCurrentThread(bd));
+        WeakReference<String> ref = new WeakReference<String>(elem.intern());
+        elem = null;
+        while (ref.get() != null) {
+            System.gc();
+        }
 
-		locker.unlock(bd);
-		assertTrue(locker.isHeldByCurrentThread(bd));
+        assertTrue(locker.isHeldByCurrentThread("LOCKME"));
+    }
 
-		locker.unlock(bd);
-		assertFalse(locker.isHeldByCurrentThread(bd));
-	}
+    private final class Thread1 extends Thread {
+        private final Locker<String> tl;
 
-	private final class ThreadQueued extends Thread {
+        Boolean result = null;
 
-		private final Locker<String> locker;
+        private Thread1(Locker<String> tl) {
+            this.tl = tl;
+        }
 
-		private boolean runme = true;
+        @Override
+        public void run() {
+            try {
+                tl.unlock("LOCKME");
+                tl.lock("LOCK2");
+                tl.lock("LOCK2");
+                tl.lock("LOCK2");
+                tl.unlock("LOCK2");
+                tl.unlock("LOCK2");
+                tl.unlock("LOCK2");
+                tl.lock("LOCKME", 1L);
+                result = false;
+            } catch (TimeoutException e) {
+                result = true;
+            }
+        }
+    }
 
-		private boolean isRunning = false;
+    private final class Thread2 extends Thread {
+        private final Locker<String> locker;
 
-		public ThreadQueued(Locker<String> locker) {
-			this.locker = locker;
-		}
+        Boolean result = null;
 
-		@Override
-		public void run() {
-			locker.lock("LOCKME");
-			isRunning = true;
-			while (runme) {
-				try {
-					Thread.sleep(1);
-				} catch (InterruptedException e) {
-				}
-			}
-			locker.unlock("LOCKME");
-		}
-	}
+        private Thread2(Locker<String> locker) {
+            this.locker = locker;
+        }
 
-	@Test
-	public void testLockOrder() throws Exception {
-		final Locker<String> locker = new Locker<String>();
+        @Override
+        public void run() {
+            locker.lock("LOCKME");
+            result = true;
+            locker.unlock("LOCKME");
+        }
+    }
 
-		ThreadQueued[] threads = new ThreadQueued[10];
-		for (int i = 0; i < 10; i++) {
-			threads[i] = new ThreadQueued(locker);
-			threads[i].start();
-			Thread.sleep(50);
-		}
+    private final class ThreadQueued extends Thread {
 
-		for (int i = 0; i < 10; i++) {
-			assertTrue(String.valueOf(i), threads[i].isRunning);
-			threads[i].runme = false;
-			threads[i].join();
-			Thread.sleep(50);
-		}
-	}
+        private final Locker<String> locker;
 
-	@Test
-	public void testExecuteWithLock() throws Exception {
-		Locker<String> locker = new Locker<>();
-		String elem = "LOCKME";
-		locker.lock(elem);
-		// ... with Runnable
-		locker.executeWithLock(elem, () -> System.out.println("Hello: " + elem));
-		// ... with Supplier
-		long result = locker.executeWithLock(elem, () -> 5L);
-		assertEquals(5L, result);
-		assertTrue(locker.isHeldByCurrentThread(elem));
-	}
+        private boolean runme = true;
 
-	@Test
-	@Ignore
-	public void testWithGarbageCollection() throws Exception {
-		Locker<String> locker = new Locker<>();
-		String elem = "LOCKME" + System.currentTimeMillis();
-		locker.lock(elem);
+        private boolean isRunning = false;
 
-		WeakReference<String> ref = new WeakReference<String>(elem.intern());
-		elem = null;
-		while (ref.get() != null) {
-			System.gc();
-		}
+        public ThreadQueued(Locker<String> locker) {
+            this.locker = locker;
+        }
 
-		assertTrue(locker.isHeldByCurrentThread("LOCKME"));
-	}
+        @Override
+        public void run() {
+            locker.lock("LOCKME");
+            isRunning = true;
+            while (runme) {
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                }
+            }
+            locker.unlock("LOCKME");
+        }
+    }
 }

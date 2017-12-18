@@ -5,31 +5,31 @@ package de.thksystems.util.concurrent;
  */
 public class NamedRunnable implements Runnable {
 
-	private final Runnable runnable;
-	private String threadName;
+    private final Runnable runnable;
+    private String threadName;
 
-	protected NamedRunnable(Runnable runnable) {
-		this.runnable = runnable;
-	}
+    protected NamedRunnable(Runnable runnable) {
+        this.runnable = runnable;
+    }
 
-	@Override
-	public void run() {
-		String oldThreadName = Thread.currentThread().getName();
-		try {
-			Thread.currentThread().setName(threadName);
-			runnable.run();
-		} finally {
-			Thread.currentThread().setName(oldThreadName);
-		}
-	}
+    public static NamedRunnable of(Runnable runnable) {
+        return new NamedRunnable(runnable);
+    }
 
-	public static NamedRunnable of(Runnable runnable) {
-		return new NamedRunnable(runnable);
-	}
+    @Override
+    public void run() {
+        String oldThreadName = Thread.currentThread().getName();
+        try {
+            Thread.currentThread().setName(threadName);
+            runnable.run();
+        } finally {
+            Thread.currentThread().setName(oldThreadName);
+        }
+    }
 
-	public NamedRunnable withThreadName(String threadName) {
-		this.threadName = threadName;
-		return this;
-	}
+    public NamedRunnable withThreadName(String threadName) {
+        this.threadName = threadName;
+        return this;
+    }
 
 }

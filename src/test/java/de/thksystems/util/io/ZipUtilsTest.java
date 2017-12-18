@@ -16,23 +16,23 @@ import org.junit.Test;
 
 public class ZipUtilsTest {
 
-	@Test
-	public void testZipStringToFile() throws IOException {
-		File tmpFile = File.createTempFile(getClass().getName(), "test");
+    @Test
+    public void testZipStringToFile() throws IOException {
+        File tmpFile = File.createTempFile(getClass().getName(), "test");
 
-		String zipEntryName = "entry";
-		String stringToZip = "This is a test";
-		ZipUtils.zipStringToFile(tmpFile, zipEntryName, stringToZip);
+        String zipEntryName = "entry";
+        String stringToZip = "This is a test";
+        ZipUtils.zipStringToFile(tmpFile, zipEntryName, stringToZip);
 
-		ZipInputStream zis = new ZipInputStream(new FileInputStream(tmpFile));
-		ZipEntry entry = zis.getNextEntry();
-		assertNotNull(entry);
-		assertEquals(zipEntryName, entry.getName());
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		IOUtils.copy(zis, bos);
-		assertEquals(stringToZip, bos.toString());
-		assertNull(zis.getNextEntry());
-		zis.close();
-		bos.close();
-	}
+        ZipInputStream zis = new ZipInputStream(new FileInputStream(tmpFile));
+        ZipEntry entry = zis.getNextEntry();
+        assertNotNull(entry);
+        assertEquals(zipEntryName, entry.getName());
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        IOUtils.copy(zis, bos);
+        assertEquals(stringToZip, bos.toString());
+        assertNull(zis.getNextEntry());
+        zis.close();
+        bos.close();
+    }
 }

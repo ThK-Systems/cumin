@@ -1,6 +1,6 @@
 /*
  * tksCommons
- * 
+ *
  * Author : Thomas Kuhlmann (ThK-Systems, http://www.thk-systems.de) License : LGPL (https://www.gnu.org/licenses/lgpl.html)
  */
 package de.thksystems.util.lang;

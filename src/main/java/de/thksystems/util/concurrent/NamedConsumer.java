@@ -1,6 +1,6 @@
 /*
  * tksCommons
- * 
+ *
  * Author  : Thomas Kuhlmann (ThK-Systems, http://www.thk-systems.de)
  * License : LGPL (https://www.gnu.org/licenses/lgpl.html)
  */
@@ -13,26 +13,26 @@ import java.util.function.Consumer;
  */
 public class NamedConsumer<V> implements Consumer<V> {
 
-	private final Consumer<V> consumer;
-	private String threadName;
+    private final Consumer<V> consumer;
+    private String threadName;
 
-	protected NamedConsumer(Consumer<V> consumer) {
-		this.consumer = consumer;
-	}
+    protected NamedConsumer(Consumer<V> consumer) {
+        this.consumer = consumer;
+    }
 
-	@Override
-	public void accept(V t) {
-		String oldThreadName = Thread.currentThread().getName();
-		try {
-			Thread.currentThread().setName(threadName.replace("{thread-id}", String.valueOf(Thread.currentThread().getId())));
-			consumer.accept(t);
-		} finally {
-			Thread.currentThread().setName(oldThreadName);
-		}
-	}
+    public static <V> NamedConsumer<V> of(Consumer<V> consumer) {
+        return new NamedConsumer<>(consumer);
+    }
 
-	public static <V> NamedConsumer<V> of(Consumer<V> consumer) {
-		return new NamedConsumer<>(consumer);
-	}
+    @Override
+    public void accept(V t) {
+        String oldThreadName = Thread.currentThread().getName();
+        try {
+            Thread.currentThread().setName(threadName.replace("{thread-id}", String.valueOf(Thread.currentThread().getId())));
+            consumer.accept(t);
+        } finally {
+            Thread.currentThread().setName(oldThreadName);
+        }
+    }
 
 }

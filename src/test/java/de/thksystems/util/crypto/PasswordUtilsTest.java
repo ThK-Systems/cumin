@@ -9,16 +9,16 @@ import org.junit.Test;
 
 public class PasswordUtilsTest {
 
-	@Test
-	public void testCreatePasswordHash() {
-		assertNotEquals("Geheim", PasswordUtils.createPasswordHash("Geheim"));
-		assertNotNull(PasswordUtils.createPasswordHash("FooBar42"));
-		assertNull(PasswordUtils.createPasswordHash(null));
-		assertNull(PasswordUtils.createPasswordHash(""));
+    @Test
+    public void testCreatePasswordHash() {
+        assertNotEquals("Geheim", PasswordUtils.createPasswordHash("Geheim"));
+        assertNotNull(PasswordUtils.createPasswordHash("FooBar42"));
+        assertNull(PasswordUtils.createPasswordHash(null));
+        assertNull(PasswordUtils.createPasswordHash(""));
 
-		String run1 = PasswordUtils.createPasswordHash("VeryS3cret!");
-		String run2 = PasswordUtils.createPasswordHash("VeryS3cret!");
-		assertEquals(run1, run2);
-	}
+        String run1 = PasswordUtils.createPasswordHash("VeryS3cret!");
+        String run2 = PasswordUtils.createPasswordHash("VeryS3cret!");
+        assertEquals(run1, run2);
+    }
 
 }

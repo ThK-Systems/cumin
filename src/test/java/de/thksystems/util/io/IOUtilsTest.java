@@ -8,12 +8,12 @@ import org.junit.Test;
 
 public class IOUtilsTest {
 
-	@Test
-	public void testCopyStringWriter() {
-		String myText = "FooBar42";
-		StringWriter sw = new StringWriter();
-		sw.write(myText);
-		assertEquals(myText, IOUtils.copyStringWriter(sw).toString());
-	}
+    @Test
+    public void testCopyStringWriter() {
+        String myText = "FooBar42";
+        StringWriter sw = new StringWriter();
+        sw.write(myText);
+        assertEquals(myText, IOUtils.copyStringWriter(sw).toString());
+    }
 
 }

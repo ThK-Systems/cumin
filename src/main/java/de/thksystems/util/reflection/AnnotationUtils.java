@@ -1,7 +1,7 @@
 /*
  * tksCommons
- * 
- * Author  : Thomas Kuhlmann (ThK-Systems, http://www.thk-systems.de) 
+ *
+ * Author  : Thomas Kuhlmann (ThK-Systems, http://www.thk-systems.de)
  * License : LGPL (https://www.gnu.org/licenses/lgpl.html)
  */
 package de.thksystems.util.reflection;
@@ -12,24 +12,25 @@ import java.util.Arrays;
 
 public final class AnnotationUtils {
 
-	private AnnotationUtils() {}
+    private AnnotationUtils() {
+    }
 
-	/**
-	 * Gets the names of all fields annotated with the given annotation (including super classes).
-	 */
-	public static String[] getFieldNamesAnnotatedWith(Object obj, Class<? extends Annotation> annotationClass) {
-		return Arrays.stream(getFieldsAnnotatedWith(obj, annotationClass)).map(field -> field.getName()).toArray(size -> new String[size]);
-	}
+    /**
+     * Gets the names of all fields annotated with the given annotation (including super classes).
+     */
+    public static String[] getFieldNamesAnnotatedWith(Object obj, Class<? extends Annotation> annotationClass) {
+        return Arrays.stream(getFieldsAnnotatedWith(obj, annotationClass)).map(field -> field.getName()).toArray(size -> new String[size]);
+    }
 
-	/**
-	 * Gets all fields annotated with the given annotation (including super classes)..
-	 */
-	public static Field[] getFieldsAnnotatedWith(Object obj, Class<? extends Annotation> annotationClass) {
-		// @formatter:off
-		return ReflectionUtils.getAllFields(obj.getClass()).stream()
-				.filter(field -> field.isAnnotationPresent(annotationClass))
-				.toArray(size -> new Field[size]);
-		// @formatter:on
-	}
+    /**
+     * Gets all fields annotated with the given annotation (including super classes)..
+     */
+    public static Field[] getFieldsAnnotatedWith(Object obj, Class<? extends Annotation> annotationClass) {
+        // @formatter:off
+        return ReflectionUtils.getAllFields(obj.getClass()).stream()
+                .filter(field -> field.isAnnotationPresent(annotationClass))
+                .toArray(size -> new Field[size]);
+        // @formatter:on
+    }
 
 }
