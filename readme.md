@@ -1,8 +1,8 @@
 # cumin
 
-## Summary
-
 cumin provides some utility classes for java (standard edition): \[tabby title="Overview"\]
+
+## Overview
 
 *   **CollectionUtils** \- Simply creating collections
 *   **MapUtils** \- Simply creating maps
@@ -31,7 +31,7 @@ cumin provides some utility classes for java (standard edition): \[tabby title="
 
 
 ## Documentation
-Browse the **[Javadoc of the latest version](http://www.thk-systems.de/content/oss/javadoc/cumin/current/index.html)**. ('cumin' is well documented there.)
+Browse the [Javadoc of the latest version](http://www.thk-systems.de/content/oss/javadoc/cumin/current/index.html). ('cumin' is well documented there.)
 
 
 ## Installation
