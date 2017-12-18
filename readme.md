@@ -1,4 +1,4 @@
-# Cumin
+# cumin
 
 ## Summary
 
@@ -8,7 +8,7 @@ cumin provides some utility classes for java (standard edition): \[tabby title="
 *   **MapUtils** \- Simply creating maps
 *   **ExceptionUtils** \- Get nice mini stacktrace, check for exception types in cause hierarchy
 *   **ZipUtils** \- Write data or a string to a zip-file
-*   **ReflectionUtils** \- Some relections helper
+*   **ReflectionUtils** \- Some reflections helper
 *   **AnnotationUtils** \- Gets fields of a class annotated with a special annotation
 *   **ObjectUtils** \- Annotation based toString(), equals(), hashCode
 *   **LocaleUtils** \- Access locales (JDK or ICU (preferred))
@@ -16,10 +16,10 @@ cumin provides some utility classes for java (standard edition): \[tabby title="
 *   **RandomStringUtils** \- Create random strings
 *   **CSVUtils** \- Reading a CSV file as a list of string-arrays
 *   **IOUtils** \- Copy a StringWriter
-*   **ParseUtils** \- Parsing filesizes (like '5.3GB', '6k') or durations (like '5s', '2.5h')
+*   **ParseUtils** \- Parsing file sizes (like '5.3GB', '6k') or durations (like '5s', '2.5h')
 *   **DNSUtils** \- Get domain record, check for hostname against ip-address
 *   **DomUtils** \- Manipulation DOM, DOM as string
-*   **PasswortUtils** \- Hashes for password
+*   **PasswordUtils** \- Hashes for password
 *   **WrappingAtomicCounter** \- used for wrapping counter 0..1..2..3..4..5..0..1..2.. .
 *   **Locker** \- For locking arbitrary objects.
 *   **Deferred** \- For lazy initialization
