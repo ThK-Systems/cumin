@@ -6,8 +6,6 @@ import java.util.List;
 
 import org.junit.Test;
 
-import de.thksystems.util.collection.CollectionUtils;
-
 public class CollectionUtilsTest {
 
 	@Test
