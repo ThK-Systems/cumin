@@ -29,8 +29,7 @@ public class NamedSupplier<V> implements Supplier<V> {
         String oldThreadName = Thread.currentThread().getName();
         try {
             Thread.currentThread().setName(threadName.replace("{thread-id}", String.valueOf(Thread.currentThread().getId())));
-            V result = supplier.get();
-            return result;
+            return supplier.get();
         } finally {
             Thread.currentThread().setName(oldThreadName);
         }

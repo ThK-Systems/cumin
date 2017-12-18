@@ -1,7 +1,8 @@
 /*
  * tksCommons
  *
- * Author : Thomas Kuhlmann (ThK-Systems, http://www.thk-systems.de) License : LGPL (https://www.gnu.org/licenses/lgpl.html)
+ * Author : Thomas Kuhlmann (ThK-Systems, http://www.thk-systems.de)
+ * License : LGPL (https://www.gnu.org/licenses/lgpl.html)
  */
 package de.thksystems.util.concurrent;
 
@@ -35,7 +36,7 @@ public final class WrappingAtomicCounter extends Number {
      * Constructs with given 'max value' and 'initial value' of 0.
      */
     public WrappingAtomicCounter(long maxValue) {
-        this(maxValue, 0l);
+        this(maxValue, 0L);
     }
 
     /**
@@ -60,7 +61,7 @@ public final class WrappingAtomicCounter extends Number {
     /**
      * Returns current counter value (starting with 'initial value') and (after that) increments the counter.
      * <p>
-     * If the counter reaches 'max value' the counter wraps the 'inital value'
+     * If the counter reaches 'max value' the counter wraps the 'initial value'
      */
     public long getAndIncrement() {
         return counter.getAndUpdate(getIncrementFunction());
@@ -92,7 +93,7 @@ public final class WrappingAtomicCounter extends Number {
     /**
      * Gets the current counter value and (after that) decrements the counter value.
      * <p>
-     * If the counter value is smaller than 'inital value' it is wrapped to 'max value'.
+     * If the counter value is smaller than 'initial value' it is wrapped to 'max value'.
      */
     public long getAndDecrement() {
         return counter.getAndUpdate(getDecrementFunction());
@@ -135,6 +136,7 @@ public final class WrappingAtomicCounter extends Number {
         return String.valueOf(get());
     }
 
+    @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
     @Override
     public boolean equals(Object obj) {
         return EqualsBuilder.reflectionEquals(this, obj);

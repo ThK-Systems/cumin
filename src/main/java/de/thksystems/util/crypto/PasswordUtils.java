@@ -53,8 +53,9 @@ public final class PasswordUtils {
     /**
      * Encrypts given password using SHA-256 and encodes Base64 .
      *
-     * @Deprecated Use {@link #createPasswordHash(String)}
+     * @deprecated Use {@link #createPasswordHash(String)}
      */
+    @Deprecated
     public static String encryptAsPassword(String password) {
         if (password == null || password.length() == 0) {
             return null;
@@ -62,8 +63,7 @@ public final class PasswordUtils {
         try {
             MessageDigest md = MessageDigest.getInstance(DEFAULT_PASSWORD_HASHALGO);
             byte[] digest = md.digest(password.getBytes());
-            String encryptedPassword = new String(new Base64().encode(digest));
-            return encryptedPassword;
+            return new String(new Base64().encode(digest));
         } catch (NoSuchAlgorithmException e) {
             throw new CryptoRuntimeException(e);
         }

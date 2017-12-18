@@ -24,7 +24,7 @@ public final class ExceptionUtils {
      * </pre>
      */
     public static String getMessageList(Throwable t) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         Throwable throwable = t;
         int depth = 0;
         while (throwable != null) {

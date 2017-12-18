@@ -24,7 +24,7 @@ public final class StringUtils {
             return null;
         }
         // @formatter:off
-        return s.chars().filter((c) -> Character.isUpperCase(c))
+        return s.chars().filter(Character::isUpperCase)
                 .collect(StringBuilder::new,
                         StringBuilder::appendCodePoint,
                         StringBuilder::append)

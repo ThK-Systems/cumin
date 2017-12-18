@@ -8,6 +8,7 @@ package de.thksystems.util.reflection;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -31,9 +32,7 @@ public final class ReflectionUtils {
     }
 
     private static List<Field> getAllFields(List<Field> fields, Class<?> type) {
-        for (Field field : type.getDeclaredFields()) {
-            fields.add(field);
-        }
+        fields.addAll(Arrays.asList(type.getDeclaredFields()));
         if (type.getSuperclass() != null) {
             fields = getAllFields(fields, type.getSuperclass());
         }

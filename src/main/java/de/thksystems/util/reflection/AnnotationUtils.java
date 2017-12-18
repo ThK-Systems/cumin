@@ -19,7 +19,7 @@ public final class AnnotationUtils {
      * Gets the names of all fields annotated with the given annotation (including super classes).
      */
     public static String[] getFieldNamesAnnotatedWith(Object obj, Class<? extends Annotation> annotationClass) {
-        return Arrays.stream(getFieldsAnnotatedWith(obj, annotationClass)).map(field -> field.getName()).toArray(size -> new String[size]);
+        return Arrays.stream(getFieldsAnnotatedWith(obj, annotationClass)).map(Field::getName).toArray(String[]::new);
     }
 
     /**
@@ -29,7 +29,7 @@ public final class AnnotationUtils {
         // @formatter:off
         return ReflectionUtils.getAllFields(obj.getClass()).stream()
                 .filter(field -> field.isAnnotationPresent(annotationClass))
-                .toArray(size -> new Field[size]);
+                .toArray(Field[]::new);
         // @formatter:on
     }
 

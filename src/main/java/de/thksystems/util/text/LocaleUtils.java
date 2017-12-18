@@ -7,6 +7,7 @@ package de.thksystems.util.text;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Currency;
 import java.util.Locale;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -24,7 +25,7 @@ public final class LocaleUtils {
 
     private static final Logger LOG = Logger.getLogger(LocaleUtils.class.getName());
 
-    private static final Deferred<LocaleDelegate> localeDelegate = new Deferred<>(() -> LocaleDelegate.getImplementation());
+    private static final Deferred<LocaleDelegate> localeDelegate = new Deferred<>(LocaleDelegate::getImplementation);
 
     private static final Deferred<Collection<String>> countryCodes = new Deferred<>(() -> localeDelegate.get().getCountryCodes());
 
@@ -47,7 +48,7 @@ public final class LocaleUtils {
         return localeCodes.get().contains(localeCode);
     }
 
-    static interface LocaleDelegate {
+    interface LocaleDelegate {
 
         static LocaleDelegate getImplementation() {
             try {
@@ -69,8 +70,6 @@ public final class LocaleUtils {
 
     }
 
-    ;
-
     static class JDKDelegate implements LocaleDelegate {
 
         @Override
@@ -80,12 +79,12 @@ public final class LocaleUtils {
 
         @Override
         public Collection<String> getCurrencyCodes() {
-            return java.util.Currency.getAvailableCurrencies().stream().map(c -> c.getCurrencyCode()).collect(Collectors.toSet());
+            return java.util.Currency.getAvailableCurrencies().stream().map(Currency::getCurrencyCode).collect(Collectors.toSet());
         }
 
         @Override
         public Collection<String> getLocaleCodes() {
-            return Arrays.stream(Locale.getAvailableLocales()).map(l -> l.toString()).collect(Collectors.toSet());
+            return Arrays.stream(Locale.getAvailableLocales()).map(Locale::toString).collect(Collectors.toSet());
         }
 
     }
@@ -99,12 +98,12 @@ public final class LocaleUtils {
 
         @Override
         public Collection<String> getCurrencyCodes() {
-            return com.ibm.icu.util.Currency.getAvailableCurrencies().stream().map(c -> c.getCurrencyCode()).collect(Collectors.toSet());
+            return com.ibm.icu.util.Currency.getAvailableCurrencies().stream().map(com.ibm.icu.util.Currency::getCurrencyCode).collect(Collectors.toSet());
         }
 
         @Override
         public Collection<String> getLocaleCodes() {
-            return Arrays.stream(ULocale.getAvailableLocales()).map(l -> l.getName()).collect(Collectors.toSet());
+            return Arrays.stream(ULocale.getAvailableLocales()).map(ULocale::getName).collect(Collectors.toSet());
         }
 
     }

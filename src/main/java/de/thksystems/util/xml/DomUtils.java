@@ -34,7 +34,7 @@ public final class DomUtils {
      * Returns the whole DOM-tree of the given {@link Node} as a list of {@link Node}s.
      */
     public static List<Node> getNodeTreeAsList(Node node) {
-        List<Node> nodeList = new ArrayList<Node>();
+        List<Node> nodeList = new ArrayList<>();
         addNodeRecursivelyToList(node, nodeList);
         return nodeList;
     }
@@ -52,7 +52,7 @@ public final class DomUtils {
      *
      * @param node               The {@link Node} to output as a {@link String}
      * @param omitXmlDeclaration <code>true</code>, if the xml-header should be omitted.
-     * @param encoding           Encoding of the text-ouptput
+     * @param encoding           Encoding of the text-output
      */
     public static String nodeToString(Node node, boolean omitXmlDeclaration, String encoding) {
         StringWriter sw = new StringWriter();

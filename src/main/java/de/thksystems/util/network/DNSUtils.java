@@ -50,7 +50,7 @@ public final class DNSUtils {
                 }
             }
         } catch (NamingException e) {
-            return new Vector<String>();
+            return new Vector<>();
         }
         return result;
     }

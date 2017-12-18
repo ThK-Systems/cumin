@@ -29,8 +29,7 @@ public class NamedCallable<V> implements Callable<V> {
         String oldThreadName = Thread.currentThread().getName();
         try {
             Thread.currentThread().setName(threadName.replace("{thread-id}", String.valueOf(Thread.currentThread().getId())));
-            V result = callable.call();
-            return result;
+            return callable.call();
         } finally {
             Thread.currentThread().setName(oldThreadName);
         }

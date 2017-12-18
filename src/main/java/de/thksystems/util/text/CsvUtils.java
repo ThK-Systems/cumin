@@ -24,10 +24,10 @@ public final class CsvUtils {
     /**
      * Returns the CSV-file from the input stream as a list of string-arrays.
      */
-    public static final List<String[]> getAsList(InputStream is, char seperator) throws IOException {
-        String sepStr = String.valueOf(seperator);
+    public static List<String[]> getAsList(InputStream is, char separator) throws IOException {
+        String sepStr = String.valueOf(separator);
         List<String> lines = IOUtils.readLines(is, Charset.defaultCharset());
-        List<String[]> csvList = new ArrayList<String[]>(lines.size());
+        List<String[]> csvList = new ArrayList<>(lines.size());
         for (String line : lines) {
             if (line != null && line.length() > 0) {
                 csvList.add(line.split(sepStr));

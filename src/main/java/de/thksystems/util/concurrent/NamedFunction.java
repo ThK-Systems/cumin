@@ -29,8 +29,7 @@ public class NamedFunction<V, R> implements Function<V, R> {
         String oldThreadName = Thread.currentThread().getName();
         try {
             Thread.currentThread().setName(threadName.replace("{thread-id}", String.valueOf(Thread.currentThread().getId())));
-            R result = function.apply(t);
-            return result;
+            return function.apply(t);
         } finally {
             Thread.currentThread().setName(oldThreadName);
         }

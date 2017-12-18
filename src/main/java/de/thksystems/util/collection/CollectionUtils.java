@@ -9,6 +9,7 @@ package de.thksystems.util.collection;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public final class CollectionUtils {
@@ -21,7 +22,7 @@ public final class CollectionUtils {
      */
     @SafeVarargs
     public static <T> List<T> createArrayList(T... entries) {
-        return addToCollection(new ArrayList<T>(), entries);
+        return addToCollection(new ArrayList<>(), entries);
     }
 
     /**
@@ -29,9 +30,7 @@ public final class CollectionUtils {
      */
     @SafeVarargs
     public static <T, C extends Collection<T>> C addToCollection(C collection, T... entries) {
-        for (T entry : entries) {
-            collection.add(entry);
-        }
+        Collections.addAll(collection, entries);
         return collection;
     }
 

@@ -15,7 +15,7 @@ import java.util.function.Supplier;
  * @see "Inspired by http://www.nosid.org/java8-threadsafe-lazy-initialization.html"
  */
 public final class Deferred<T> {
-    private volatile Supplier<T> resultSupplier = null;
+    private volatile Supplier<T> resultSupplier;
     private T result = null;
 
     public Deferred(Supplier<T> resultSupplier) {

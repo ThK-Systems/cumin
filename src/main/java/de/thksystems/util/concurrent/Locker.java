@@ -94,7 +94,7 @@ public final class Locker<T> {
     }
 
     /**
-     * {@link Locker#lock(Object, long)} with a mandatory waiting time in milliseconds.
+     * {@link Locker#lock(Object, Optional, Optional)} with a mandatory waiting time in milliseconds.
      */
     public void lock(T element, long maxWaitTime) throws TimeoutException {
         lock(element, Optional.of(maxWaitTime), Optional.empty());

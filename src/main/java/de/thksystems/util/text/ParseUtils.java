@@ -114,7 +114,7 @@ public final class ParseUtils {
                     throw new IllegalArgumentException("Invalid duration expression: " + durationString);
                 }
                 BigDecimal result = value.multiply(factor);
-                if (prevFactor == null || prevFactor.compareTo(result) == 1) {
+                if (prevFactor == null || prevFactor.compareTo(result) > 0) {
                     sum = sum.add(result);
                     prevFactor = factor;
                 } else {
@@ -133,15 +133,15 @@ public final class ParseUtils {
     private synchronized static Map<String, BigDecimal> getDurationFactorMap() {
         if (durationFactorMap == null) {
             durationFactorMap = new HashMap<>();
-            durationFactorMap.put(null, new BigDecimal(1l));
-            durationFactorMap.put("ms", new BigDecimal(1l));
-            durationFactorMap.put("s", new BigDecimal(1000l));
-            durationFactorMap.put("m", new BigDecimal(1000l * 60l));
-            durationFactorMap.put("h", new BigDecimal(1000l * 60l * 60l));
-            durationFactorMap.put("d", new BigDecimal(1000l * 60l * 60l * 24l));
-            durationFactorMap.put("w", new BigDecimal(1000l * 60l * 60l * 24l * 7l));
-            durationFactorMap.put("M", new BigDecimal(1000l * 60l * 60l * 24l * 30l));
-            durationFactorMap.put("y", new BigDecimal(1000l * 60l * 60l * 24l * 365l));
+            durationFactorMap.put(null, new BigDecimal(1L));
+            durationFactorMap.put("ms", new BigDecimal(1L));
+            durationFactorMap.put("s", new BigDecimal(1_000L));
+            durationFactorMap.put("m", new BigDecimal(1_000L * 60L));
+            durationFactorMap.put("h", new BigDecimal(1_000L * 60L * 60L));
+            durationFactorMap.put("d", new BigDecimal(1_000L * 60L * 60L * 24L));
+            durationFactorMap.put("w", new BigDecimal(1_000L * 60L * 60L * 24L * 7L));
+            durationFactorMap.put("M", new BigDecimal(1_000L * 60L * 60L * 24L * 30L));
+            durationFactorMap.put("y", new BigDecimal(1_000L * 60L * 60L * 24L * 365L));
         }
         return durationFactorMap;
     }
