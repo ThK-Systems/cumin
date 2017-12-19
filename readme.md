@@ -15,7 +15,7 @@ cumin provides some utility classes for java (standard edition):
 *   **StringUtils** \- Get capitals of a string
 *   **RandomStringUtils** \- Create random strings
 *   **CSVUtils** \- Reading a CSV file as a list of string-arrays
-*   **IOUtils** \- Copy a StringWriter
+*   **IOUtils** \- Copy a StringWriter, close a stream quietly
 *   **ParseUtils** \- Parsing file sizes (like '5.3GB', '6k') or durations (like '5s', '2.5h')
 *   **DNSUtils** \- Get domain record, check for hostname against ip-address
 *   **DomUtils** \- Manipulation DOM, DOM as string
@@ -49,6 +49,7 @@ You can browse [maven-central](http://search.maven.org/#artifactdetails|net.thk-
 ## Changelog
 
 **3.13.0 (unreleased)**
+* Added IOUtils.closeQuietly
 * Updated dependencies
 * Moved to GitHub
 
