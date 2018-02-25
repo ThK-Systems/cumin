@@ -195,7 +195,7 @@ public final class Locker<T> {
             Thread lockingThread = threadQueue.peek();
             Thread currentThread = Thread.currentThread();
             if (lockingThread != currentThread) {
-                LOG.warn("The element '{}' is NOT locked by the current thread '{}'. It is locked by thread '{}' -> IGNORED!", element, currentThread,
+                LOG.info("The element '{}' is NOT locked by the current thread '{}'. It is locked by thread '{}' -> IGNORED!", element, currentThread,
                         lockingThread);
                 return;
             }
