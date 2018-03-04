@@ -22,7 +22,7 @@ import de.thksystems.util.function.CheckedSupplier;
 /**
  * Locking util.
  */
-public final class Locker<T> {
+public final class Locker<T> implements LockerI<T> {
 
     private static final Logger LOG = LoggerFactory.getLogger(Locker.class);
 
@@ -56,6 +56,7 @@ public final class Locker<T> {
      *
      * @return <code>true</code> in case of a succeeded lock, <code>false</code> otherwise
      */
+    @Override
     public boolean tryLock(T element) {
         try {
             return lock(element, Optional.empty(), Optional.of(Boolean.TRUE));
@@ -82,6 +83,7 @@ public final class Locker<T> {
     /**
      * {@link Locker#lock(Object, long)} using an (almost) infinite waiting time.
      */
+    @Override
     public void lock(T element) {
         try {
             lock(element, Optional.empty(), Optional.empty());
@@ -181,6 +183,7 @@ public final class Locker<T> {
      * <p>
      * It is null-safe, because it may be used in finally blocks.
      */
+    @Override
     public void unlock(T element) {
         if (element == null) {
             return;
@@ -212,6 +215,7 @@ public final class Locker<T> {
     /**
      * Returns <code>true</code>, if locked (by another thread).
      */
+    @Override
     public boolean isLocked(T element) {
         if (threadQueueMap.containsKey(element)) {
             Thread thread = threadQueueMap.get(element).peek();
