@@ -26,14 +26,14 @@ import org.slf4j.LoggerFactory;
 
 import de.thksystems.util.concurrent.Consumers;
 
-public class ScalingWorkerQueue<E> {
+public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
 
     private static final Logger LOG = LoggerFactory.getLogger(ScalingWorkerQueue.class);
 
     private final Function<Integer, Collection<E>> supplier;
-    private final BiConsumer<E, WorkerQueueConfiguration> worker;
+    private final BiConsumer<E, C> worker;
+    private final C configuration;
 
-    private WorkerQueueConfiguration configuration = new DefaultWorkerQueueConfiguration();
     private ThreadFactory threadFactory = new BasicThreadFactory.Builder()
             .uncaughtExceptionHandler((thread, throwable) -> LOG.error("Uncaught error in thread '{}': {}", thread, throwable.getMessage(), throwable))
             .build();
@@ -44,35 +44,37 @@ public class ScalingWorkerQueue<E> {
     private Queue<E> internalQueue = new ConcurrentLinkedQueue<>();
     private List<Runner> runners = new ArrayList<>();
 
-    private Function<E, Boolean> lockFunction = element -> true;
+    private Function<E, Boolean> trylockFunction = element -> true;
     private Consumer<E> unlockFunction = Consumers.noOp();
-    private Function<E, Boolean> checkFunction = element -> true;
+    private Function<E, Boolean> integrityFunction = element -> true;
 
     private boolean stop = false;
 
-    public ScalingWorkerQueue(Function<Integer, Collection<E>> supplier, BiConsumer<E, WorkerQueueConfiguration> worker) {
+    public ScalingWorkerQueue(C configuration, Function<Integer, Collection<E>> supplier, BiConsumer<E, C> worker) {
+        this.configuration = configuration;
         this.supplier = supplier;
         this.worker = worker;
     }
 
-    public ScalingWorkerQueue<E> withThreadFactory(ThreadFactory threadFactory) {
+    public ScalingWorkerQueue<E, C> withThreadFactory(ThreadFactory threadFactory) {
         this.threadFactory = threadFactory;
         return this;
     }
 
-    public ScalingWorkerQueue<E> withDistributedSetup(Function<E, Boolean> lockFunction, Consumer<E> unlockFunction, Function<E, Boolean> checkFunction) {
-        this.lockFunction = lockFunction;
-        this.unlockFunction = unlockFunction;
-        this.checkFunction = checkFunction; // TODO Rename
+    public ScalingWorkerQueue<E, C> withDistributedSetup(Function<E, Boolean> trylockFunction, Consumer<E> unlockFunction, Function<E, Boolean> integrityFunction) {
+        if(trylockFunction != null) {
+            this.trylockFunction = trylockFunction;
+        }
+        if(unlockFunction != null) {
+            this.unlockFunction = unlockFunction;
+        }
+        if(integrityFunction != null) {
+            this.integrityFunction = integrityFunction;
+        }
         return this;
     }
 
-    public ScalingWorkerQueue<E> withConfiguration(WorkerQueueConfiguration queueConfiguration) {
-        this.configuration = queueConfiguration;
-        return this;
-    }
-
-    public ScalingWorkerQueue<E> withThreadNames(Function<Thread, String> dispatcherThreadNameSupplier, BiFunction<Thread, Integer, String> workerThreadNameSupplier) {
+    public ScalingWorkerQueue<E, C> withThreadNames(Function<Thread, String> dispatcherThreadNameSupplier, BiFunction<Thread, Integer, String> workerThreadNameSupplier) {
         this.dispatcherThreadNameSupplier = dispatcherThreadNameSupplier;
         this.workerThreadNameSupplier = workerThreadNameSupplier;
         return this;
@@ -158,18 +160,19 @@ public class ScalingWorkerQueue<E> {
                 Thread.currentThread().setName(workerThreadNameSupplier.apply(Thread.currentThread(), number));
 
                 while (!ScalingWorkerQueue.this.shouldStop()) {
-                    Optional<E> element = ScalingWorkerQueue.this.getNextElement();
-                    LOG.debug("Getting and processing element: {}", element);
+                    Optional<E> optionalElement = ScalingWorkerQueue.this.getNextElement();
+                    LOG.debug("Getting and processing element: {}", optionalElement);
                     // Process element
-                    if(element.isPresent()) {
+                    if(optionalElement.isPresent()) {
                         noResultStartTime = null;   // Reset idle counter (in case of no result)
-                        if(lockFunction.apply(element.get()) && checkFunction.apply(element.get())) {
+                        E element = optionalElement.get();
+                        if(trylockFunction.apply(element) && integrityFunction.apply(element)) {
                             try {
-                                worker.accept(element.get(), configuration);
+                                worker.accept(element, configuration);
                             } catch (Throwable throwable) {
                                 LOG.error(throwable.getMessage(), throwable);
                             } finally {
-                                unlockFunction.accept(element.get());
+                                unlockFunction.accept(element);
                             }
                         }
                     }
