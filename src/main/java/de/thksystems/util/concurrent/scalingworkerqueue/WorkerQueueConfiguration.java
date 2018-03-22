@@ -10,9 +10,9 @@ package de.thksystems.util.concurrent.scalingworkerqueue;
 public interface WorkerQueueConfiguration {
 
     /**
-     * Period (in ms) the dispatcher sleeps between checks (for new elements, to stop, ...)
+     * Period (in ms) the dispatcher / or runner sleeps between checks
      */
-    long getDispatcherSleepPeriod();
+    long getSleepPeriod();
 
     /**
      * Period (ms) to wait on empty fetch.

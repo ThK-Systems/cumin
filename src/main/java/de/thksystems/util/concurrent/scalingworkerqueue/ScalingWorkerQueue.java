@@ -143,10 +143,10 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
 
                 // Wait until the size of the internal queue falls below a given limit.
                 while (!shouldStop()
-                        && internalQueue.size() >= spareElementCount
-                        && (idleWaitUntil == null || System.currentTimeMillis() < idleWaitUntil)) {
+                        && ((internalQueue.size() >= spareElementCount && idleWaitUntil == null)
+                        || (idleWaitUntil != null && System.currentTimeMillis() < idleWaitUntil))) {
                     try {
-                        Thread.sleep(configuration.getDispatcherSleepPeriod());
+                        Thread.sleep(configuration.getSleepPeriod());
                     } catch (InterruptedException e) {
                         throw new UnsupportedOperationException("The scaling worker queue must not interrupted. Use stop() instead.", e);
                     }
@@ -197,10 +197,10 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
 
                 while (!ScalingWorkerQueue.this.shouldStop()) {
                     Optional<E> optionalElement = ScalingWorkerQueue.this.getNextElement();
-                    LOG.debug("Getting and processing element: {}", optionalElement);
                     // Process element
                     if(optionalElement.isPresent()) {
                         E element = optionalElement.get();
+                        LOG.debug("Getting and processing element: {}", element);
                         try {
                             noResultStartTime = null;   // Reset idle counter (in case of no result)
                             if(trylockFunction.apply(element) && integrityCheckFunction.apply(element)) {
@@ -218,6 +218,7 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
                     }
                     // No result
                     else {
+                        LOG.trace("Got no element");
                         if(noResultStartTime == null) {
                             noResultStartTime = System.currentTimeMillis();  // Remember timestamp of first no result
                         }
@@ -228,10 +229,13 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
                             break;
                         }
                         // Wait ...
-                        try {
-                            Thread.sleep(configuration.getRunnerSleepIdlePeriod());
-                        } catch (InterruptedException e) {
-                            throw new UnsupportedOperationException("The runner thread must not interrupted.", e);
+                        Long idleWaitUntil = System.currentTimeMillis() + configuration.getRunnerSleepIdlePeriod();
+                        while (!ScalingWorkerQueue.this.shouldStop() && System.currentTimeMillis() < idleWaitUntil) {
+                            try {
+                                Thread.sleep(configuration.getSleepPeriod());
+                            } catch (InterruptedException e) {
+                                throw new UnsupportedOperationException("The runner thread must not interrupted.", e);
+                            }
                         }
                     }
                 }
