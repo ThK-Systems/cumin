@@ -9,18 +9,24 @@ package de.thksystems.util.concurrent.scalingworkerqueue;
 
 public class DefaultWorkerQueueConfiguration implements WorkerQueueConfiguration {
 
-    public static final int DEFAULT_DISPATCHER_SLEEP_PERIOD = 500;
+    public static final long DEFAULT_DISPATCHER_SLEEP_PERIOD = 500L;
+    public static final long DEFAULT_DISPATCHER_WAIT_PERIOD_EMPTY_FETCH = 5_000L;
     public static final int DEFAULT_COUNT_OF_ELEMENT_PER_RUNNER = 2;
     public static final int DEFAULT_MIN_ELEMENTS_COUNT_TO_SUPPLY = 10;
     public static final int DEFAULT_MAX_RUNNER_COUNT = 10;
     public static final int DEFAULT_MIN_RUNNER_COUNT = 1;
     public static final int DEFAULT_SPARE_ELEMENTS_COUNT_TO_SUPPLY = DEFAULT_COUNT_OF_ELEMENT_PER_RUNNER;
-    public static final int DEFAULT_RUNNER_SLEEP_IDLE_PERIOD = 500;
-    public static final int DEFAULT_RUNNER_MAX_IDLE_PERIOD = 30_000;
+    public static final long DEFAULT_RUNNER_SLEEP_IDLE_PERIOD = 500L;
+    public static final long DEFAULT_RUNNER_MAX_IDLE_PERIOD = 30_000L;
 
     @Override
     public long getDispatcherSleepPeriod() {
         return DEFAULT_DISPATCHER_SLEEP_PERIOD;
+    }
+
+    @Override
+    public long getDispatcherWaitPeriodOnEmptyFetch() {
+        return DEFAULT_DISPATCHER_WAIT_PERIOD_EMPTY_FETCH;
     }
 
     @Override

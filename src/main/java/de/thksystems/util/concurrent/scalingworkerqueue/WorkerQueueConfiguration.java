@@ -15,6 +15,11 @@ public interface WorkerQueueConfiguration {
     long getDispatcherSleepPeriod();
 
     /**
+     * Period (ms) to wait on empty fetch.
+     */
+    long getDispatcherWaitPeriodOnEmptyFetch();
+
+    /**
      * Count of elements per runner.
      */
     int getCountOfElementsPerRunner();
