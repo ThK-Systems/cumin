@@ -24,7 +24,7 @@ public class ScalingWorkerQueueTest {
         swq.start();
         sleepWithoutException(6_000L);
         swq.stop();
-        sleepWithoutException(3_000L);
+        sleepWithoutException(1_000L);
     }
 
     @Test
@@ -46,7 +46,7 @@ public class ScalingWorkerQueueTest {
         swq.start();
         sleepWithoutException(40_000L);
         swq.stop();
-        sleepWithoutException(3_000L);
+        sleepWithoutException(1_000L);
     }
 
     private void sleepWithoutException(long l) {

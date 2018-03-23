@@ -190,7 +190,7 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
 
         @Override
         public void run() {
-            LOG.debug("Additional runner started: {} (mandatory: {})", number, !canDieIfIdle);
+            LOG.info("Additional runner started: {} (mandatory: {})", number, !canDieIfIdle);
             String oldThreadName = Thread.currentThread().getName();
             try {
                 Thread.currentThread().setName(workerThreadNameSupplier.apply(Thread.currentThread(), number));
@@ -224,7 +224,7 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
                         }
                         // Check, if this runner (thread) should (and can) die, because it is idle too long
                         else if(canDieIfIdle && System.currentTimeMillis() > noResultStartTime + configuration.getRunnerMaxIdlePeriod()) {
-                            LOG.debug("Runner is idle and will be stopped.");
+                            LOG.info("Runner is idle and will be stopped.");
                             ScalingWorkerQueue.this.removeRunner(this);
                             break;
                         }
@@ -239,7 +239,7 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
                         }
                     }
                 }
-                LOG.debug("Runner {} stopped", number);
+                LOG.info("Runner {} stopped", number);
             } finally {
                 Thread.currentThread().setName(oldThreadName);
             }

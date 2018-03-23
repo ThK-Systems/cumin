@@ -26,6 +26,7 @@ cumin provides some utility classes for java (standard edition):
 *   **NamedRunnable** \- Runnable with the ability to set the thread-name that is used while running
 *   **NamedCallable** \- Callable with the ability to set the thread-name that is used while calling
 *   **CheckedFunction**, **CheckedSupplier**, **CheckedConsumer**, **CheckedRunnable** - Functional interfaces that can throws exceptions
+*   **ScalingWorkerQueue** \- A scaling worker queue
 
 ... more to come ... 
 
