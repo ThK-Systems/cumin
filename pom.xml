@@ -39,11 +39,11 @@
             <artifactId>commons-codec</artifactId>
         </dependency>
 
-        <!-- ICU (only optional) -->
+        <!-- ICU (only provided) -->
         <dependency>
             <groupId>com.ibm.icu</groupId>
             <artifactId>icu4j</artifactId>
-            <scope>optional</scope>
+            <scope>provided</scope>
         </dependency>
 
         <!-- BOUNCY CASTLE (runtime) -->
