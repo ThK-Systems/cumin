@@ -129,10 +129,9 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
             while (!shouldStop()) {
                 try {
                     // Get elements by supplying function
-                    LOG.debug("Fetching additional elements");
-
+                    LOG.trace("Fetching additional elements");
                     Collection<E> elements = supplier.apply(Math.max(configuration.getMinElementsCountToSupply(), elementsPerRunner * runners.size() + spareElementCount));
-                    LOG.debug("Fetched {} elements", elements.size());
+                    LOG.debug("Fetched {} additional elements", elements.size());
                     idleWaitUntil = null;
                     addedCount = 0L;
 
@@ -174,7 +173,7 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
                 } catch (Exception e) {
                     LOG.error("Caught exception: {} -> Sleeping some time", e.getMessage(), e);
                     int i = 10;
-                    while (!shouldStop() && i-- > 0) {
+                    while (!shouldStop() && i-- >= 0) {
                         ThreadUtils.sleepWithoutException(configuration.getSleepPeriod());
                     }
                 }
@@ -274,7 +273,7 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
                     }
                 }
             } catch (Exception e) {
-                LOG.error("Caught exception: {}", e.getMessage(), e);
+                LOG.error("Caught exception {}", e.getMessage(), e);
             } finally {
                 LOG.info("Runner {} stopped", number);
                 ScalingWorkerQueue.this.removeRunner(this);
