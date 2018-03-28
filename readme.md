@@ -26,6 +26,7 @@ cumin provides some utility classes for java (standard edition):
 *   **NamedRunnable** \- Runnable with the ability to set the thread-name that is used while running
 *   **NamedCallable** \- Callable with the ability to set the thread-name that is used while calling
 *   **CheckedFunction**, **CheckedSupplier**, **CheckedConsumer**, **CheckedRunnable** - Functional interfaces that can throws exceptions
+*   **ThreadUtils** \- Sleep without exceptions ;)
 *   **ScalingWorkerQueue** \- A scaling worker queue
 
 ... more to come ... 
@@ -51,6 +52,7 @@ You can browse [maven-central](http://search.maven.org/#artifactdetails|net.thk-
 
 **3.13.0 (unreleased)**
 * Added ScalingWorkerQueue
+* Added ThreadUtils
 * Added IOUtils.closeQuietly
 * Updated dependencies
 * Moved to GitHub
