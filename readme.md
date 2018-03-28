@@ -42,7 +42,7 @@ Browse the [Javadoc of the latest version](http://www.thk-systems.de/content/oss
 <dependency>
   <groupId>net.thk-systems.commons</groupId>
   <artifactId>cumin</artifactId>
-  <version>3.12.0</version>
+  <version>3.13.0</version>
 </dependency>
 ```
 You can browse [maven-central](http://search.maven.org/#artifactdetails|net.thk-systems.commons|cumin|3.12.0|jar) to download the jar or another versions.
@@ -50,7 +50,7 @@ You can browse [maven-central](http://search.maven.org/#artifactdetails|net.thk-
 
 ## Changelog
 
-**3.13.0 (unreleased)**
+**3.13.0**
 * Added ScalingWorkerQueue
 * Added ThreadUtils
 * Added IOUtils.closeQuietly
