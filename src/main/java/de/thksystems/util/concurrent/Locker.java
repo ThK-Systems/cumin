@@ -109,7 +109,7 @@ public final class Locker<T> implements LockerI<T> {
      */
     @SuppressWarnings("unchecked")
     protected boolean lock(T element, Optional<Long> optionalMaxWaitTime, Optional<Boolean> tryLock) throws TimeoutException {
-        LOG.debug("Locking: {}", element);
+        LOG.info("Locking: {}", element);
 
         // We need a unique string (if element if of type String)
         if (element instanceof String) {
@@ -188,7 +188,7 @@ public final class Locker<T> implements LockerI<T> {
         if (element == null) {
             return;
         }
-        LOG.debug("Unlocking: {}", element);
+        LOG.info("Unlocking: {}", element);
         Queue<Thread> threadQueue = getThreadQueueForElement(element, false);
         if (threadQueue == null) {
             LOG.warn("The element '{}' is NOT locked!", element);

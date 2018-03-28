@@ -31,7 +31,15 @@ import de.thksystems.util.concurrent.ThreadUtils;
 
 public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
 
+    private enum Status {
+        CREATED, START_TRIGGERED, STARTED, STOP_TRIGGERED, STOPPED;
+    }
+
+    public static final long WAIT_FOR_STATUS_PERIOD = 10L;
+
     private static final Logger LOG = LoggerFactory.getLogger(ScalingWorkerQueue.class);
+
+    private Status status = Status.CREATED;
 
     private final Function<Integer, Collection<E>> supplier;
     private final BiConsumer<E, C> worker;
@@ -51,9 +59,6 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
     private Queue<E> internalQueue = new ConcurrentLinkedQueue<>();
     private Set<E> elementsInWork = ConcurrentHashMap.newKeySet();
     private List<Runner> runners = new ArrayList<>();
-
-    private boolean stop = false;
-    private boolean started = false;
 
     public ScalingWorkerQueue(C configuration, Function<Integer, Collection<E>> supplier, BiConsumer<E, C> worker) {
         this.configuration = configuration;
@@ -86,30 +91,41 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
     }
 
     public ScalingWorkerQueue<E, C> start() {
-        start(false);
-        return this;
+        return start(false);
     }
 
-    public ScalingWorkerQueue<E, C> start(boolean waitOnStarted) {
+    public ScalingWorkerQueue<E, C> start(boolean waitForStart) {
+        status = Status.START_TRIGGERED;
         threadFactory.newThread(this::run).start();
-        while (waitOnStarted && !isStarted()) {
-            ThreadUtils.sleepWithoutException(10L);
+        while (waitForStart && !isStarted()) {
+            ThreadUtils.sleepWithoutException(WAIT_FOR_STATUS_PERIOD);
         }
         return this;
     }
 
     public boolean isStarted() {
-        return started;
+        return status == Status.STARTED;
     }
 
     public ScalingWorkerQueue stop() {
-        LOG.info("Stopping worker queue");
-        this.stop = true;
+        return stop(false);
+    }
+
+    public ScalingWorkerQueue stop(boolean waitForStop) {
+        LOG.info("Requesting stop of worker queue");
+        status = Status.STOP_TRIGGERED;
+        while (waitForStop && !isStopped()) {
+            ThreadUtils.sleepWithoutException(WAIT_FOR_STATUS_PERIOD);
+        }
         return this;
     }
 
     public boolean shouldStop() {
-        return stop;
+        return status == Status.STOP_TRIGGERED;
+    }
+
+    public boolean isStopped() {
+        return status == Status.STOPPED;
     }
 
     private void run() {
@@ -117,7 +133,7 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
         try {
             Thread.currentThread().setName(dispatcherThreadNameSupplier.apply(Thread.currentThread()));
             LOG.info("Worker queue started");
-            started = true;
+            status = Status.STARTED;
 
             int elementsPerRunner = configuration.getCountOfElementsPerRunner();
             int maxRunner = configuration.getMaxRunnerCount();
@@ -179,6 +195,10 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
                 }
             }
         } finally {
+            while (getRunnersCount() > 0) { // Wait for runners to be stopped (to not kill their 'parent' thread)
+                ThreadUtils.sleepWithoutException(WAIT_FOR_STATUS_PERIOD);
+            }
+            status = Status.STOPPED;
             LOG.info("Worker queue stopped");
             Thread.currentThread().setName(oldThreadName);
         }
@@ -234,7 +254,7 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
                     // Process element
                     if(optionalElement.isPresent()) {
                         E element = optionalElement.get();
-                        LOG.debug("Getting and processing (by worker) element: {}", element);
+                        LOG.info("Got: {}", element);
                         try {
                             noResultStartTime = null;   // Reset idle counter (in case of no result)
                             if(trylockFunction.apply(element) && integrityCheckFunction.apply(element)) {
@@ -276,8 +296,8 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
                 LOG.error("Caught exception {}", e.getMessage(), e);
             } finally {
                 LOG.info("Runner {} stopped", number);
-                ScalingWorkerQueue.this.removeRunner(this);
                 Thread.currentThread().setName(oldThreadName);
+                ScalingWorkerQueue.this.removeRunner(this);
             }
         }
 
