@@ -50,6 +50,9 @@ You can browse [maven-central](http://search.maven.org/#artifactdetails|net.thk-
 
 ## Changelog
 
+**3.13.1 (unreleased)**
+* Make ParseUtils.* nullsafe
+ 
 **3.13.0**
 * Added ScalingWorkerQueue
 * Added ThreadUtils

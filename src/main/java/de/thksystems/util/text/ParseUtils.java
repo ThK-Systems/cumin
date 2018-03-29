@@ -39,7 +39,7 @@ public final class ParseUtils {
      * @return size in bytes as {@link BigDecimal} (<code>null</code>, if a invalid 'filesize' is given.)
      */
     public static BigDecimal parseFileSize(String filesize) {
-        if (filesize == null || filesize.length() == 0) {
+        if (filesize == null || StringUtils.isBlank(filesize)) {
             return null;
         }
         Matcher matcher = FILESIZE_PATTERN.matcher(filesize);
@@ -85,7 +85,7 @@ public final class ParseUtils {
     /**
      * Parse duration.
      * <p>
-     * Input-Pattern: [0-9]+(ms|s|m|h|d|w|M|y), e.g. "50ms", "133453m", "7d", "13M"
+     * Input-Pattern: [0-9]+(ms|s|m|h|d|w|M|y), e.g. "50ms", "133453m", "7d", "13M", "18.3s", "5m 3s", "2h 30m 15.4s"
      * <p>
      * Units:
      * <ul>
@@ -102,6 +102,9 @@ public final class ParseUtils {
      * @return duration in milliseconds
      */
     public static BigDecimal parseDuration(String durationString) {
+        if (durationString == null || StringUtils.isBlank(durationString)) {
+            return null;
+        }
         durationString = durationString.trim();
         if (StringUtils.isNotEmpty(durationString) && DURATION_PATTERN_WHOLE.matcher(durationString).matches()) {
             BigDecimal sum = BigDecimal.ZERO;
