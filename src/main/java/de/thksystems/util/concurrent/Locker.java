@@ -207,7 +207,7 @@ public final class Locker<T> implements LockerI<T> {
                 LOG.trace("Unlocked.");
             } else {
                 lockCounts.merge(element, 1L, (old, dec) -> old - dec);
-                LOG.debug("Unlocking not possible, because locked more than onced. Decreased lock counter to {}", lockCounts.get(element));
+                LOG.debug("Unlocking not possible, because locked more than once. Decreased lock counter to {}", lockCounts.get(element));
             }
         }
     }
