@@ -20,11 +20,16 @@ import org.apache.commons.lang3.StringUtils;
 public final class ParseUtils {
 
     public static final BigDecimal VALUE_BIGDECIMAL_MINUSONE = new BigDecimal("-1");
+    public static final BigDecimal VALUE_BIGDECIMAL_LONGMAX = new BigDecimal(Long.MAX_VALUE);
+
+    public static final String INFINITE = "∞";
 
     private static final Pattern FILESIZE_PATTERN = Pattern.compile("^([0-9.]+)([ETGMK]B?)$", Pattern.CASE_INSENSITIVE);
+
     private static final String DURATION_PATTERN_STRING = "([0-9.]+)(ms|s|m|h|d|w|M|y)?\\s*";
     private static final Pattern DURATION_PATTERN = Pattern.compile(DURATION_PATTERN_STRING);
     private static final Pattern DURATION_PATTERN_WHOLE = Pattern.compile("^(" + DURATION_PATTERN_STRING + ")+$");
+
     private static Map<String, Integer> fileSizePowMap = null;
     private static Map<String, BigDecimal> durationFactorMap = null;
 
@@ -85,7 +90,7 @@ public final class ParseUtils {
     /**
      * Parse duration.
      * <p>
-     * Input-Pattern: [0-9]+(ms|s|m|h|d|w|M|y), e.g. "50ms", "133453m", "7d", "13M", "18.3s", "5m 3s", "2h 30m 15.4s"
+     * Input-Pattern: [0-9]+(ms|s|m|h|d|w|M|y), e.g. "50ms", "133453m", "7d", "13M", "18.3s", "5m 3s", "2h 30m 15.4s", "∞"
      * <p>
      * Units:
      * <ul>
@@ -97,6 +102,7 @@ public final class ParseUtils {
      * <li>w -> weeks</li>
      * <li>M -> months (30 days)</li>
      * <li>y -> years (365 days)</li>
+     * <li>∞ -> {@link Long#MAX_VALUE}</li>
      * </ul>
      *
      * @return duration in milliseconds
@@ -106,6 +112,9 @@ public final class ParseUtils {
             return null;
         }
         durationString = durationString.trim();
+        if (INFINITE.equals(durationString)) {
+            return VALUE_BIGDECIMAL_LONGMAX;
+        }
         if (StringUtils.isNotEmpty(durationString) && DURATION_PATTERN_WHOLE.matcher(durationString).matches()) {
             BigDecimal sum = BigDecimal.ZERO;
             BigDecimal prevFactor = null;

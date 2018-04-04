@@ -44,6 +44,8 @@ public class ParseUtilsTest {
         assertNull(ParseUtils.parseDuration(""));
         assertNull(ParseUtils.parseDuration(" "));
         assertNull(ParseUtils.parseDuration(null));
+
+        assertEquals(Long.MAX_VALUE, ParseUtils.parseDuration(" ∞ ").longValue());
     }
 
     @Test(expected = IllegalArgumentException.class)
