@@ -31,8 +31,17 @@ import de.thksystems.util.concurrent.ThreadUtils;
 
 public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
 
-    private enum Status {
-        CREATED, START_TRIGGERED, STARTED, STOP_TRIGGERED, STOPPED;
+    public ScalingWorkerQueue<E, C> withDistributedSetup(Function<E, Boolean> trylockFunction, Consumer<E> unlockFunction, Function<E, Boolean> integrityCheckFunction) {
+        if (trylockFunction != null) {
+            this.trylockFunction = trylockFunction;
+        }
+        if (unlockFunction != null) {
+            this.unlockFunction = unlockFunction;
+        }
+        if (integrityCheckFunction != null) {
+            this.integrityCheckFunction = integrityCheckFunction;
+        }
+        return this;
     }
 
     public static final long WAIT_FOR_STATUS_PERIOD = 10L;
@@ -71,17 +80,83 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
         return this;
     }
 
-    public ScalingWorkerQueue<E, C> withDistributedSetup(Function<E, Boolean> trylockFunction, Consumer<E> unlockFunction, Function<E, Boolean> integrityCheckFunction) {
-        if(trylockFunction != null) {
-            this.trylockFunction = trylockFunction;
+    private void run() {
+        String oldThreadName = Thread.currentThread().getName();
+        try {
+            Thread.currentThread().setName(dispatcherThreadNameSupplier.apply(Thread.currentThread()));
+            LOG.info("Worker queue started");
+            status = Status.STARTED;
+
+            int minElementsCountToSupply = configuration.getMinElementsCountToSupply();
+            int spareElementCount = configuration.getSpareElementsCountToSupply();
+            int elementsPerRunner = configuration.getCountOfElementsPerRunner();
+            int maxRunner = configuration.getMaxRunnerCount();
+            int minRunner = configuration.getMinRunnerCount();
+            long dispatcherWaitPeriodOnEmptyFetch = configuration.getDispatcherWaitPeriodOnEmptyFetch();
+            long sleepPeriod = configuration.getSleepPeriod();
+
+            Long idleWaitUntil, addedCount;
+
+            while (!shouldStop()) {
+                try {
+                    // Get elements by supplying function
+                    LOG.trace("Fetching additional elements");
+                    Collection<E> elements = supplier.apply(Math.max(minElementsCountToSupply, elementsPerRunner * runners.size() + spareElementCount));
+                    LOG.debug("Fetched {} additional elements", elements.size());
+                    idleWaitUntil = null;
+                    addedCount = 0L;
+
+                    // Add only fetched elements, that are not already in the queue
+                    // This does not break concurrency, because this is the only place and thread, elements are added to the queue.
+                    // (This does not have a good performance for larger queues, but we should not have them.)
+                    for (E element : elements) {
+                        if (!internalQueue.contains(element) && !elementsInWork.contains(element)) {
+                            LOG.trace("Adding fetched element to internal queue: {}", element);
+                            internalQueue.add(element);
+                            addedCount++;
+                        } else {
+                            LOG.trace("Skipping fetched element. It is already in the internal queue or currently processed: {}", element);
+                        }
+                    }
+                    // If no (new) elements are added to the internal queue, we sleep some time ...
+                    if (addedCount == 0) {
+                        LOG.trace("No (new) element fetched. Waiting some time.");
+                        idleWaitUntil = System.currentTimeMillis() + dispatcherWaitPeriodOnEmptyFetch;
+                    }
+
+                    // Create runner/worker threads, if needed
+                    while (!shouldStop() && runners.size() < Math.min(maxRunner, (double) elements.size() / elementsPerRunner)) {
+                        Runner runner = new Runner(runners.size(), runners.size() > minRunner);
+                        runners.add(runner);
+                        threadFactory.newThread(runner).start();
+                    }
+
+                    // Wait until the size of the internal queue falls below a given limit.
+                    while (!shouldStop()
+                            && ((internalQueue.size() >= spareElementCount && idleWaitUntil == null)
+                            || (idleWaitUntil != null && System.currentTimeMillis() < idleWaitUntil))) {
+                        try {
+                            Thread.sleep(sleepPeriod);
+                        } catch (InterruptedException e) {
+                            throw new UnsupportedOperationException("The scaling worker queue must not interrupted. Use stop() instead.", e);
+                        }
+                    }
+                } catch (Exception e) {
+                    LOG.error("Caught exception: {} -> Sleeping some time", e.getMessage(), e);
+                    int i = 10;
+                    while (!shouldStop() && i-- >= 0) {
+                        ThreadUtils.sleepWithoutException(sleepPeriod);
+                    }
+                }
+            }
+        } finally {
+            while (getRunnersCount() > 0) { // Wait for runners to be stopped (to not kill their 'parent' thread)
+                ThreadUtils.sleepWithoutException(WAIT_FOR_STATUS_PERIOD);
+            }
+            status = Status.STOPPED;
+            LOG.info("Worker queue stopped");
+            Thread.currentThread().setName(oldThreadName);
         }
-        if(unlockFunction != null) {
-            this.unlockFunction = unlockFunction;
-        }
-        if(integrityCheckFunction != null) {
-            this.integrityCheckFunction = integrityCheckFunction;
-        }
-        return this;
     }
 
     public ScalingWorkerQueue<E, C> withThreadNames(Function<Thread, String> dispatcherThreadNameSupplier, BiFunction<Thread, Integer, String> workerThreadNameSupplier) {
@@ -128,99 +203,27 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
         return status == Status.STOPPED;
     }
 
-    private void run() {
-        String oldThreadName = Thread.currentThread().getName();
-        try {
-            Thread.currentThread().setName(dispatcherThreadNameSupplier.apply(Thread.currentThread()));
-            LOG.info("Worker queue started");
-            status = Status.STARTED;
-
-            int elementsPerRunner = configuration.getCountOfElementsPerRunner();
-            int maxRunner = configuration.getMaxRunnerCount();
-            int minRunner = configuration.getMinRunnerCount();
-            int spareElementCount = configuration.getSpareElementsCountToSupply();
-
-            Long idleWaitUntil, addedCount;
-
-            while (!shouldStop()) {
-                try {
-                    // Get elements by supplying function
-                    LOG.trace("Fetching additional elements");
-                    Collection<E> elements = supplier.apply(Math.max(configuration.getMinElementsCountToSupply(), elementsPerRunner * runners.size() + spareElementCount));
-                    LOG.debug("Fetched {} additional elements", elements.size());
-                    idleWaitUntil = null;
-                    addedCount = 0L;
-
-                    // Add only fetched elements, that are not already in the queue
-                    // This does not break concurrency, because this is the only place and thread, elements are added to the queue.
-                    // (This does not have a good performance for larger queues, but we should not have them.)
-                    for (E element : elements) {
-                        if(!internalQueue.contains(element) && !elementsInWork.contains(element)) {
-                            LOG.trace("Adding fetched element to internal queue: {}", element);
-                            internalQueue.add(element);
-                            addedCount++;
-                        } else {
-                            LOG.trace("Skipping fetched element. It is already in the internal queue or currently processed: {}", element);
-                        }
-                    }
-                    // If no (new) elements are added to the internal queue, we sleep some time ...
-                    if(addedCount == 0) {
-                        LOG.trace("No (new) element fetched. Waiting some time.");
-                        idleWaitUntil = System.currentTimeMillis() + configuration.getDispatcherWaitPeriodOnEmptyFetch();
-                    }
-
-                    // Create runner/worker threads, if needed
-                    while (!shouldStop() && runners.size() < Math.min(maxRunner, (double) elements.size() / elementsPerRunner)) {
-                        Runner runner = new Runner(runners.size(), runners.size() > minRunner);
-                        runners.add(runner);
-                        threadFactory.newThread(runner).start();
-                    }
-
-                    // Wait until the size of the internal queue falls below a given limit.
-                    while (!shouldStop()
-                            && ((internalQueue.size() >= spareElementCount && idleWaitUntil == null)
-                            || (idleWaitUntil != null && System.currentTimeMillis() < idleWaitUntil))) {
-                        try {
-                            Thread.sleep(configuration.getSleepPeriod());
-                        } catch (InterruptedException e) {
-                            throw new UnsupportedOperationException("The scaling worker queue must not interrupted. Use stop() instead.", e);
-                        }
-                    }
-                } catch (Exception e) {
-                    LOG.error("Caught exception: {} -> Sleeping some time", e.getMessage(), e);
-                    int i = 10;
-                    while (!shouldStop() && i-- >= 0) {
-                        ThreadUtils.sleepWithoutException(configuration.getSleepPeriod());
-                    }
-                }
-            }
-        } finally {
-            while (getRunnersCount() > 0) { // Wait for runners to be stopped (to not kill their 'parent' thread)
-                ThreadUtils.sleepWithoutException(WAIT_FOR_STATUS_PERIOD);
-            }
-            status = Status.STOPPED;
-            LOG.info("Worker queue stopped");
-            Thread.currentThread().setName(oldThreadName);
-        }
-    }
-
     synchronized Optional<E> getNextElement() {
         E element = internalQueue.peek();
-        if(element != null) {
+        if (element != null) {
             elementsInWork.add(element);
             internalQueue.remove();
         }
         return Optional.ofNullable(element);
     }
 
+    void markElementAsProcessed(E element) {
+        if (element != null) {
+            elementsInWork.remove(element);
+        }
+    }
+
     boolean hasNextElement() {
         return !internalQueue.isEmpty();
     }
 
-    void markElementAsProcessed(E element) {
-        if(element != null) {
-            elementsInWork.remove(element);
-        }
+    private enum Status {
+        CREATED, START_TRIGGERED, STARTED, STOP_TRIGGERED, STOPPED
     }
 
     void removeRunner(Runner runner) {
@@ -249,15 +252,19 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
                 Thread.currentThread().setName(workerThreadNameSupplier.apply(Thread.currentThread(), number));
                 LOG.info("Additional runner started: {} (mandatory: {})", number, !canDieIfIdle);
 
+                long sleepPeriod = configuration.getSleepPeriod();
+                long runnerMaxIdlePeriod = configuration.getRunnerMaxIdlePeriod();
+                long runnerSleepIdlePeriod = configuration.getRunnerSleepIdlePeriod();
+
                 while (!ScalingWorkerQueue.this.shouldStop()) {
                     Optional<E> optionalElement = ScalingWorkerQueue.this.getNextElement();
                     // Process element
-                    if(optionalElement.isPresent()) {
+                    if (optionalElement.isPresent()) {
                         E element = optionalElement.get();
                         LOG.info("Got next: {}", element);
                         try {
                             noResultStartTime = null;   // Reset idle counter (in case of no result)
-                            if(trylockFunction.apply(element) && integrityCheckFunction.apply(element)) {
+                            if (trylockFunction.apply(element) && integrityCheckFunction.apply(element)) {
                                 try {
                                     worker.accept(element, configuration);
                                 } catch (Throwable throwable) {
@@ -273,19 +280,21 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
                     // No result
                     else {
                         LOG.trace("Got no next element");
-                        if(noResultStartTime == null) {
+                        if (noResultStartTime == null) {
                             noResultStartTime = System.currentTimeMillis();  // Remember timestamp of first no result
                         }
                         // Check, if this runner (thread) should (and can) die, because it is idle too long
-                        else if(canDieIfIdle && System.currentTimeMillis() > noResultStartTime + configuration.getRunnerMaxIdlePeriod()) {
-                            LOG.info("Runner is idle and will be stopped.");
-                            break;
+                        else {
+                            if (canDieIfIdle && System.currentTimeMillis() > noResultStartTime + runnerMaxIdlePeriod) {
+                                LOG.info("Runner is idle and will be stopped.");
+                                break;
+                            }
                         }
                         // Wait ...
-                        Long idleWaitUntil = System.currentTimeMillis() + configuration.getRunnerSleepIdlePeriod();
+                        Long idleWaitUntil = System.currentTimeMillis() + runnerSleepIdlePeriod;
                         while (!ScalingWorkerQueue.this.shouldStop() && System.currentTimeMillis() < idleWaitUntil) {
                             try {
-                                Thread.sleep(configuration.getSleepPeriod());
+                                Thread.sleep(sleepPeriod);
                             } catch (InterruptedException e) {
                                 throw new UnsupportedOperationException("The runner thread must not interrupted.", e);
                             }
