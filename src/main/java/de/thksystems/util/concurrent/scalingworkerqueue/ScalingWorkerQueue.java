@@ -254,7 +254,7 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
                     // Process element
                     if(optionalElement.isPresent()) {
                         E element = optionalElement.get();
-                        LOG.info("Got: {}", element);
+                        LOG.info("Got next: {}", element);
                         try {
                             noResultStartTime = null;   // Reset idle counter (in case of no result)
                             if(trylockFunction.apply(element) && integrityCheckFunction.apply(element)) {
@@ -272,7 +272,7 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
                     }
                     // No result
                     else {
-                        LOG.trace("Got no element");
+                        LOG.trace("Got no next element");
                         if(noResultStartTime == null) {
                             noResultStartTime = System.currentTimeMillis();  // Remember timestamp of first no result
                         }
