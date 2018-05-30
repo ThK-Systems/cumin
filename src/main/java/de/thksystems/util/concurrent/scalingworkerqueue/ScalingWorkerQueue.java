@@ -102,7 +102,11 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
                     // Get elements by supplying function
                     LOG.trace("Fetching additional elements");
                     Collection<E> elements = supplier.apply(Math.max(minElementsCountToSupply, elementsPerRunner * runners.size() + spareElementCount));
-                    LOG.debug("Fetched {} additional elements", elements.size());
+                    if (elements.size() > 0) {
+                        LOG.debug("Fetched {} additional elements", elements.size());
+                    } else {
+                        LOG.trace("Fetched {} additional elements", elements.size());
+                    }
                     idleWaitUntil = null;
                     addedCount = 0L;
 
@@ -115,7 +119,7 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
                             internalQueue.add(element);
                             addedCount++;
                         } else {
-                            LOG.trace("Skipping fetched element. It is already in the internal queue or currently processed: {}", element);
+                            LOG.debug("Skipping fetched element. It is already in the internal queue or currently processed: {}", element);
                         }
                     }
                     // If no (new) elements are added to the internal queue, we sleep some time ...
@@ -142,8 +146,8 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
                         }
                     }
                 } catch (Exception e) {
-                    LOG.error("Caught exception: {} -> Sleeping some time", e.getMessage(), e);
-                    int i = 10;
+                    LOG.error("Caught exception: {} -> Sleeping some time (30s)", e.getMessage(), e);
+                    long i = 30_000L / sleepPeriod;
                     while (!shouldStop() && i-- >= 0) {
                         ThreadUtils.sleepWithoutException(sleepPeriod);
                     }

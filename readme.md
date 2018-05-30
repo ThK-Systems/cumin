@@ -42,13 +42,17 @@ Browse the [Javadoc of the latest version](http://www.thk-systems.de/content/oss
 <dependency>
   <groupId>net.thk-systems.commons</groupId>
   <artifactId>cumin</artifactId>
-  <version>3.13.1</version>
+  <version>3.13.2</version>
 </dependency>
 ```
-You can browse [maven-central](http://search.maven.org/#artifactdetails|net.thk-systems.commons|cumin|3.13.1|jar) to download the jar or another versions.
+You can browse [maven-central](http://search.maven.org/#artifactdetails|net.thk-systems.commons|cumin|3.13.2|jar) to download the jar or another versions.
 
 
 ## Changelog
+
+**3.13.2**
+* Optimized logging
+* Bugfixes
 
 **3.13.1**
 * Make ParseUtils.* nullsafe

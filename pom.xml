@@ -5,7 +5,7 @@
     <groupId>net.thk-systems.commons</groupId>
     <artifactId>cumin</artifactId>
     <packaging>jar</packaging>
-    <version>3.13.1</version>
+    <version>3.13.2</version>
     <name>cumin</name>
 
     <parent>
