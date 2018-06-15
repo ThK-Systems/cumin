@@ -15,6 +15,11 @@ public interface WorkerQueueConfiguration {
     long getSleepPeriod();
 
     /**
+     * Count of sleep periods sleeping on an error during dispatcher run.
+     */
+    int getSleepPeriodCountOnError();
+
+    /**
      * Period (ms) to wait on empty fetch.
      */
     long getDispatcherWaitPeriodOnEmptyFetch();
@@ -53,4 +58,5 @@ public interface WorkerQueueConfiguration {
      * Maximum idle period (in ms) of a runner. If this period is exceeded, the runner is stopped (if possible).
      */
     long getRunnerMaxIdlePeriod();
+
 }

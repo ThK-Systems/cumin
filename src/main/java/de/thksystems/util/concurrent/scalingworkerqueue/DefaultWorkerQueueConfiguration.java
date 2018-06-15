@@ -10,6 +10,7 @@ package de.thksystems.util.concurrent.scalingworkerqueue;
 public class DefaultWorkerQueueConfiguration implements WorkerQueueConfiguration {
 
     public static final long DEFAULT_SLEEP_PERIOD = 500L;
+    private static final int DEFAULT_SLEEP_PERIOD_COUNT_ON_ERROR = 20;
     public static final long DEFAULT_DISPATCHER_WAIT_PERIOD_EMPTY_FETCH = 5_000L;
     public static final int DEFAULT_COUNT_OF_ELEMENT_PER_RUNNER = 2;
     public static final int DEFAULT_MIN_ELEMENTS_COUNT_TO_SUPPLY = 10;
@@ -22,6 +23,11 @@ public class DefaultWorkerQueueConfiguration implements WorkerQueueConfiguration
     @Override
     public long getSleepPeriod() {
         return DEFAULT_SLEEP_PERIOD;
+    }
+
+    @Override
+    public int getSleepPeriodCountOnError() {
+        return DEFAULT_SLEEP_PERIOD_COUNT_ON_ERROR;
     }
 
     @Override
