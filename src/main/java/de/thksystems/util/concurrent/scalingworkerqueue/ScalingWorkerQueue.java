@@ -33,29 +33,40 @@ import de.thksystems.util.concurrent.ThreadUtils;
 
 public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
 
-    private Map<ListenerEvent, Consumer<E>> eventListenerMap = new HashMap<>();
-    private Queue<E> internalQueue = new ConcurrentLinkedQueue<>();
+    public enum ListenerEvent {
+        ADDED_TO_QUEUE, REMOVED_FROM_QUEUE
+    }
+
+    private enum Status {
+        CREATED, START_TRIGGERED, STARTED, STOP_TRIGGERED, STOPPED
+
+    }
 
     private static final Logger LOG = LoggerFactory.getLogger(ScalingWorkerQueue.class);
 
     public static final long WAIT_FOR_STATUS_PERIOD = 10L;
-    private Status status = Status.CREATED;
-    private final Function<Integer, Collection<E>> supplier;
 
+    private Status status = Status.CREATED;
+
+    private final Function<Integer, Collection<E>> supplier;
     private final BiConsumer<E, C> worker;
 
     private final C configuration;
+
     private ThreadFactory threadFactory = new BasicThreadFactory.Builder()
             .uncaughtExceptionHandler((thread, throwable) -> LOG.error("Uncaught error in thread '{}': {}", thread, throwable.getMessage(), throwable))
             .build();
 
     private Function<Thread, String> dispatcherThreadNameSupplier = Thread::getName;
     private BiFunction<Thread, Integer, String> workerThreadNameSupplier = (thread, numberOfRunner) -> thread.getName();
+
     private Function<E, Boolean> trylockFunction = element -> true;
-
     private Consumer<E> unlockFunction = Consumers.noOp();
-
     private Function<E, Boolean> integrityCheckFunction = element -> true;
+
+    private Map<ListenerEvent, Consumer<E>> eventListenerMap = new HashMap<>();
+
+    private Queue<E> internalQueue = new ConcurrentLinkedQueue<>();
     private Set<E> elementsInWork = ConcurrentHashMap.newKeySet();
     private List<Runner> runners = new ArrayList<>();
 
@@ -65,18 +76,8 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
         this.supplier = supplier;
     }
 
-    public ScalingWorkerQueue<E, C> withThreadNames(Function<Thread, String> dispatcherThreadNameSupplier, BiFunction<Thread, Integer, String> workerThreadNameSupplier) {
-        this.dispatcherThreadNameSupplier = dispatcherThreadNameSupplier;
-        this.workerThreadNameSupplier = workerThreadNameSupplier;
-        return this;
-    }
-
-    public ScalingWorkerQueue<E, C> withEventListener(ListenerEvent listenerEvent, Consumer<E> listener) {
-        eventListenerMap.put(listenerEvent, listener);
-        return this;
-    }
-
     public ScalingWorkerQueue<E, C> withDistributedSetup(Function<E, Boolean> trylockFunction, Consumer<E> unlockFunction, Function<E, Boolean> integrityCheckFunction) {
+        assertStatusCreated();
         if (trylockFunction != null) {
             this.trylockFunction = trylockFunction;
         }
@@ -89,13 +90,71 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
         return this;
     }
 
+    public ScalingWorkerQueue<E, C> withThreadNames(Function<Thread, String> dispatcherThreadNameSupplier, BiFunction<Thread, Integer, String> workerThreadNameSupplier) {
+        assertStatusCreated();
+        this.dispatcherThreadNameSupplier = dispatcherThreadNameSupplier;
+        this.workerThreadNameSupplier = workerThreadNameSupplier;
+        return this;
+    }
+
+    public ScalingWorkerQueue<E, C> withThreadFactory(ThreadFactory threadFactory) {
+        assertStatusCreated();
+        this.threadFactory = threadFactory;
+        return this;
+    }
+
+    public ScalingWorkerQueue<E, C> withEventListener(ListenerEvent listenerEvent, Consumer<E> listener) {
+        assertStatusCreated();
+        eventListenerMap.put(listenerEvent, listener);
+        return this;
+    }
+
+    private void assertStatusCreated() {
+        if (status != Status.CREATED) {
+            throw new IllegalStateException("The configuration of the scaling worker queue must not be changed after it is started.");
+        }
+    }
+
     protected void executeEventListener(ListenerEvent listenerEvent, E element) {
         eventListenerMap.getOrDefault(listenerEvent, Consumers.noOp()).accept(element);
     }
 
-    public ScalingWorkerQueue<E, C> withThreadFactory(ThreadFactory threadFactory) {
-        this.threadFactory = threadFactory;
+    public ScalingWorkerQueue<E, C> start() {
+        return start(false);
+    }
+
+    public ScalingWorkerQueue<E, C> start(boolean waitForStart) {
+        status = Status.START_TRIGGERED;
+        threadFactory.newThread(this::run).start();
+        while (waitForStart && !isStarted()) {
+            ThreadUtils.sleepWithoutException(WAIT_FOR_STATUS_PERIOD);
+        }
         return this;
+    }
+
+    public boolean isStarted() {
+        return status == Status.STARTED;
+    }
+
+    public ScalingWorkerQueue stop() {
+        return stop(false);
+    }
+
+    public ScalingWorkerQueue stop(boolean waitForStop) {
+        LOG.info("Requesting stop of worker queue");
+        status = Status.STOP_TRIGGERED;
+        while (waitForStop && !isStopped()) {
+            ThreadUtils.sleepWithoutException(WAIT_FOR_STATUS_PERIOD);
+        }
+        return this;
+    }
+
+    public boolean shouldStop() {
+        return status == Status.STOP_TRIGGERED;
+    }
+
+    public boolean isStopped() {
+        return status == Status.STOPPED;
     }
 
     private void run() {
@@ -187,55 +246,6 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
         }
     }
 
-    void markElementAsProcessed(E element) {
-        if (element != null) {
-            elementsInWork.remove(element);
-            executeEventListener(ListenerEvent.REMOVED_FROM_QUEUE, element);
-        }
-    }
-
-    public ScalingWorkerQueue<E, C> start() {
-        return start(false);
-    }
-
-    public ScalingWorkerQueue<E, C> start(boolean waitForStart) {
-        status = Status.START_TRIGGERED;
-        threadFactory.newThread(this::run).start();
-        while (waitForStart && !isStarted()) {
-            ThreadUtils.sleepWithoutException(WAIT_FOR_STATUS_PERIOD);
-        }
-        return this;
-    }
-
-    public boolean isStarted() {
-        return status == Status.STARTED;
-    }
-
-    public ScalingWorkerQueue stop() {
-        return stop(false);
-    }
-
-    public ScalingWorkerQueue stop(boolean waitForStop) {
-        LOG.info("Requesting stop of worker queue");
-        status = Status.STOP_TRIGGERED;
-        while (waitForStop && !isStopped()) {
-            ThreadUtils.sleepWithoutException(WAIT_FOR_STATUS_PERIOD);
-        }
-        return this;
-    }
-
-    public boolean shouldStop() {
-        return status == Status.STOP_TRIGGERED;
-    }
-
-    public boolean isStopped() {
-        return status == Status.STOPPED;
-    }
-
-    public enum ListenerEvent {
-        ADDED_TO_QUEUE, REMOVED_FROM_QUEUE
-    }
-
     synchronized Optional<E> getNextElement() {
         E element = internalQueue.peek();
         if (element != null) {
@@ -245,13 +255,15 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
         return Optional.ofNullable(element);
     }
 
-    private enum Status {
-        CREATED, START_TRIGGERED, STARTED, STOP_TRIGGERED, STOPPED
-
-    }
-
     boolean hasNextElement() {
         return !internalQueue.isEmpty();
+    }
+
+    void markElementAsProcessed(E element) {
+        if (element != null) {
+            elementsInWork.remove(element);
+            executeEventListener(ListenerEvent.REMOVED_FROM_QUEUE, element);
+        }
     }
 
     void removeRunner(Runner runner) {
