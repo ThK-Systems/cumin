@@ -44,7 +44,7 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
 
     private static final Logger LOG = LoggerFactory.getLogger(ScalingWorkerQueue.class);
 
-    public static final long WAIT_FOR_STATUS_PERIOD = 10L;
+    private static final long WAIT_FOR_STATUS_PERIOD = 10L;
 
     private Status status = Status.CREATED;
 
@@ -184,11 +184,12 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
                     if (elements.size() > 0) {
                         LOG.debug("Fetched {} additional elements", elements.size());
                         if (elements.size() > maxFetchCount) {
-                            LOG.warn("Fetching more elements than wanted: {} vs {}.", elements.size(), maxFetchCount);
+                            LOG.warn("Fetching more elements than wanted: {} > {}.", elements.size(), maxFetchCount);
                         }
                     } else {
-                        LOG.trace("Fetched {} additional elements", elements.size());
+                        LOG.trace("Fetched no additional elements");
                     }
+
                     idleWaitUntil = null;
                     addedCount = 0L;
 
