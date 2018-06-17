@@ -46,6 +46,7 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
 
     private static final long WAIT_FOR_STATUS_PERIOD = 10L;
 
+    private long dispatcherThreadId;
     private Status status = Status.CREATED;
 
     private final Function<Integer, Collection<E>> supplier;
@@ -64,7 +65,7 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
     private Consumer<E> unlockFunction = Consumers.noOp();
     private Function<E, Boolean> integrityCheckFunction = element -> true;
 
-    private Map<ListenerEvent, Consumer<E>> eventListenerMap = new HashMap<>();
+    private Map<ListenerEvent, BiConsumer<Long, E>> eventListenerMap = new HashMap<>();
 
     private Queue<E> internalQueue = new ConcurrentLinkedQueue<>();
     private Set<E> elementsInWork = ConcurrentHashMap.newKeySet();
@@ -103,20 +104,20 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
         return this;
     }
 
-    public ScalingWorkerQueue<E, C> withEventListener(ListenerEvent listenerEvent, Consumer<E> listener) {
+    public ScalingWorkerQueue<E, C> withEventListener(ListenerEvent listenerEvent, BiConsumer<Long, E> listener) {
         assertStatusCreated();
         eventListenerMap.put(listenerEvent, listener);
         return this;
+    }
+
+    protected void executeEventListener(ListenerEvent listenerEvent, E element) {
+        eventListenerMap.getOrDefault(listenerEvent, Consumers.noBiOp()).accept(dispatcherThreadId, element);
     }
 
     private void assertStatusCreated() {
         if (status != Status.CREATED) {
             throw new IllegalStateException("The configuration of the scaling worker queue must not be changed after it is started.");
         }
-    }
-
-    protected void executeEventListener(ListenerEvent listenerEvent, E element) {
-        eventListenerMap.getOrDefault(listenerEvent, Consumers.noOp()).accept(element);
     }
 
     public ScalingWorkerQueue<E, C> start() {
@@ -160,6 +161,7 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
     private void run() {
         String oldThreadName = Thread.currentThread().getName();
         try {
+            dispatcherThreadId = Thread.currentThread().getId();
             Thread.currentThread().setName(dispatcherThreadNameSupplier.apply(Thread.currentThread()));
             LOG.info("Worker queue started");
             status = Status.STARTED;

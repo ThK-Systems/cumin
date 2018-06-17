@@ -7,6 +7,7 @@
 
 package de.thksystems.util.concurrent;
 
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public final class Consumers {
@@ -19,4 +20,11 @@ public final class Consumers {
         return t-> {};
     }
     // @formatter:on
+
+    // @formatter:off
+    public static <T, S> BiConsumer<T, S> noBiOp() {
+        return (t,s)-> {};
+    }
+    // @formatter:on
+
 }
