@@ -39,7 +39,6 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
 
     private enum Status {
         CREATED, START_TRIGGERED, STARTED, STOP_TRIGGERED, STOPPED
-
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(ScalingWorkerQueue.class);
