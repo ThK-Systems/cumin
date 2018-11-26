@@ -15,16 +15,12 @@ public final class Consumers {
     private Consumers() {
     }
 
-    // @formatter:off
     public static <T> Consumer<T> noOp() {
         return t-> {};
     }
-    // @formatter:on
 
-    // @formatter:off
     public static <T, S> BiConsumer<T, S> noBiOp() {
         return (t,s)-> {};
     }
-    // @formatter:on
 
 }

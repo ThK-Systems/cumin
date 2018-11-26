@@ -23,13 +23,11 @@ public final class StringUtils {
         if (s == null) {
             return null;
         }
-        // @formatter:off
         return s.chars().filter(Character::isUpperCase)
                 .collect(StringBuilder::new,
                         StringBuilder::appendCodePoint,
                         StringBuilder::append)
                 .toString();
-        // @formatter:on
     }
 
 }

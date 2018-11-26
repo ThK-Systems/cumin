@@ -28,11 +28,9 @@ public abstract class ReflectiveBasicBean implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        //@formatter:off
         return obj != null
                 && obj.getClass().equals(this.getClass())
                 && ObjectUtils.buildEqualsReflectiveConsideringAnnotations(this, obj);
-        //@formatter:on
     }
 
 }

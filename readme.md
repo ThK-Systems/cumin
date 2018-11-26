@@ -4,7 +4,6 @@ cumin provides some utility classes for java (standard edition):
 
 ## Overview
 
-*   **CollectionUtils** \- Simply creating collections
 *   **MapUtils** \- Simply creating maps
 *   **ExceptionUtils** \- Get nice mini stacktrace, check for exception types in cause hierarchy
 *   **ZipUtils** \- Write data or a string to a zip-file
@@ -42,13 +41,18 @@ Browse the [Javadoc of the latest version](http://www.thk-systems.de/content/oss
 <dependency>
   <groupId>net.thk-systems.commons</groupId>
   <artifactId>cumin</artifactId>
-  <version>3.13.5</version>
+  <version>4.0.0</version>
 </dependency>
 ```
-You can browse [maven-central](http://search.maven.org/#artifactdetails|net.thk-systems.commons|cumin|3.13.5|jar) to download the jar or another versions.
+You can browse [maven-central](http://search.maven.org/#artifactdetails|net.thk-systems.commons|cumin|4.0.0|jar) to download the jar or another versions.
 
 
 ## Changelog
+
+**4.0.0**
+
+* Clean up deprecated / obsolete stuff
+* Updated parent pom
 
 **3.13.5**
 * Added Consumers.noBiOp

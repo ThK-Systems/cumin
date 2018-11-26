@@ -23,7 +23,7 @@ public final class DNSUtils {
     private DNSUtils() {
     }
 
-    private static DirContext getDnsDirContext() throws NamingException {
+    private static synchronized DirContext getDnsDirContext() throws NamingException {
         if (dnsDirContext == null) {
             Hashtable<String, String> env = new Hashtable<>();
             env.put("java.naming.factory.initial", "com.sun.jndi.dns.DnsContextFactory");

@@ -7,11 +7,8 @@ package de.thksystems.util.reflection;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -20,23 +17,6 @@ import java.util.Set;
 public final class ReflectionUtils {
 
     private ReflectionUtils() {
-    }
-
-    /**
-     * Gets all fields from a class including the fields from all its super-classes.
-     */
-    public static List<Field> getAllFields(Class<?> type) {
-        List<Field> fieldList = new ArrayList<>();
-        getAllFields(fieldList, type);
-        return fieldList;
-    }
-
-    private static List<Field> getAllFields(List<Field> fields, Class<?> type) {
-        fields.addAll(Arrays.asList(type.getDeclaredFields()));
-        if (type.getSuperclass() != null) {
-            fields = getAllFields(fields, type.getSuperclass());
-        }
-        return fields;
     }
 
     /**
@@ -95,16 +75,4 @@ public final class ReflectionUtils {
         }
         return valueSet;
     }
-
-    /**
-     * Returns the field value, even of a private field.
-     */
-    public static Object getFieldValue(Object myObject, Field field) throws IllegalArgumentException, IllegalAccessException {
-        boolean oldAccessibility = field.isAccessible();
-        field.setAccessible(true);
-        Object fieldValue = field.get(myObject);
-        field.setAccessible(oldAccessibility);
-        return fieldValue;
-    }
-
 }
