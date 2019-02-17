@@ -34,7 +34,7 @@ import de.thksystems.util.concurrent.ThreadUtils;
 public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
 
     public enum ListenerEvent {
-        ADDED_TO_QUEUE, REMOVED_FROM_QUEUE
+        ADDED_TO_QUEUE, REMOVED_FROM_QUEUE, RUNNER_CREATED, RUNNER_DESTROYED
     }
 
     private enum Status {
@@ -270,6 +270,7 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
 
     void removeRunner(Runner runner) {
         runners.remove(runner);
+        executeEventListener(ListenerEvent.RUNNER_DESTROYED, null);
     }
 
     public int getRunnersCount() {
@@ -283,6 +284,7 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
         private Long noResultStartTime = null;
 
         Runner(int number, boolean canDieIfIdle) {
+            executeEventListener(ListenerEvent.RUNNER_CREATED, null);
             this.number = number;
             this.canDieIfIdle = canDieIfIdle;
         }
