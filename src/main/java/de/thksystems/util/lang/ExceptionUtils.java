@@ -8,10 +8,17 @@ package de.thksystems.util.lang;
 import java.util.Optional;
 
 import org.apache.commons.lang3.ClassUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public final class ExceptionUtils {
 
     private ExceptionUtils() {
+    }
+
+    public static String asShortString(Throwable t) {
+        String className = t.getClass().getSimpleName();
+        String message = t.getMessage();
+        return StringUtils.isEmpty(message) ? className : className + ": " + message;
     }
 
     /**
@@ -23,7 +30,7 @@ public final class ExceptionUtils {
      * -> abc.xyz.GoogleStillExistsException: null
      * </pre>
      */
-    public static String getMessageList(Throwable t) {
+    public static String asMessageList(Throwable t) {
         StringBuilder sb = new StringBuilder();
         Throwable throwable = t;
         int depth = 0;

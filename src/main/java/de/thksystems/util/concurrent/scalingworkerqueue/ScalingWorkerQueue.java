@@ -8,6 +8,8 @@
 
 package de.thksystems.util.concurrent.scalingworkerqueue;
 
+import static de.thksystems.util.lang.ExceptionUtils.asShortString;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -54,7 +56,7 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
     private final C configuration;
 
     private ThreadFactory threadFactory = new BasicThreadFactory.Builder()
-            .uncaughtExceptionHandler((thread, throwable) -> LOG.error("Uncaught error in thread '{}': {}", thread, throwable.getMessage(), throwable))
+            .uncaughtExceptionHandler((thread, throwable) -> LOG.error("Uncaught error in thread '{}': {}", thread, asShortString(throwable), throwable))
             .build();
 
     private Function<Thread, String> dispatcherThreadNameSupplier = Thread::getName;
@@ -220,7 +222,7 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
 
                     // Create runner/worker threads, if needed
                     while (!shouldStop() && runners.size() < Math.min(maxRunner, (double) elements.size() / elementsPerRunner)) {
-                        Runner runner = new Runner(runners.size(), runners.size() > minRunner);
+                        Runner runner = new Runner(runners.size(), runners.size() >= minRunner);
                         runners.add(runner);
                         threadFactory.newThread(runner).start();
                     }
@@ -236,7 +238,7 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
                         }
                     }
                 } catch (Exception e) {
-                    LOG.error("Caught exception: {} -> Sleeping some time ({} ms)", e.getMessage(), sleepPeriodCountOnError * sleepPeriod, e);
+                    LOG.error("Caught exception in dispatcher: {} -> Sleeping some time ({} ms)", asShortString(e), sleepPeriodCountOnError * sleepPeriod, e);
                     long i = sleepPeriodCountOnError;
                     while (!shouldStop() && i-- >= 0) {
                         ThreadUtils.sleepWithoutException(sleepPeriod);
@@ -315,7 +317,7 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
                                 try {
                                     worker.accept(element, configuration);
                                 } catch (Throwable throwable) {
-                                    LOG.error(throwable.getMessage(), throwable);
+                                    LOG.error("Caught exception while processing element: {}", asShortString(throwable), throwable);
                                 } finally {
                                     unlockFunction.accept(element);
                                 }
@@ -338,7 +340,7 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
                             }
                         }
                         // Wait ...
-                        Long idleWaitUntil = System.currentTimeMillis() + runnerSleepIdlePeriod;
+                        long idleWaitUntil = System.currentTimeMillis() + runnerSleepIdlePeriod;
                         while (!ScalingWorkerQueue.this.shouldStop() && System.currentTimeMillis() < idleWaitUntil) {
                             try {
                                 Thread.sleep(sleepPeriod);
@@ -349,7 +351,7 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
                     }
                 }
             } catch (Exception e) {
-                LOG.error("Caught exception {}", e.getMessage(), e);
+                LOG.error("Caught exception while running: {}", asShortString(e), e);
             } finally {
                 LOG.info("Runner {} stopped", number);
                 Thread.currentThread().setName(oldThreadName);
