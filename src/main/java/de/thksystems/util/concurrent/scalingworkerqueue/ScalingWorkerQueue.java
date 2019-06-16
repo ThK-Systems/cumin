@@ -12,6 +12,7 @@ import static de.thksystems.util.lang.ExceptionUtils.asShortString;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
@@ -68,7 +70,12 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
 
     private Map<ListenerEvent, BiConsumer<Long, E>> eventListenerMap = new HashMap<>();
 
-    private Queue<E> internalQueue = new ConcurrentLinkedQueue<>();
+    private Function<E, String> toStringFunction = Object::toString;
+
+    private boolean usePriorityQueue = false;
+    private Comparator<E> priorityQueueComparator;
+
+    private Queue<E> internalQueue;
     private Set<E> elementsInWork = ConcurrentHashMap.newKeySet();
     private List<Runner> runners = new ArrayList<>();
 
@@ -76,6 +83,25 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
         this.worker = worker;
         this.configuration = configuration;
         this.supplier = supplier;
+    }
+
+    /**
+     * With no {@link Comparator} given, E must implement {@link Comparable}.<br>
+     * This requirement is not checked anywhere and may result in a runtime exception, if not fulfilled.
+     */
+    public ScalingWorkerQueue withPriorityQueue() {
+        return withPriorityQueue(null);
+    }
+
+    public ScalingWorkerQueue withPriorityQueue(Comparator<E> comparator) {
+        this.usePriorityQueue = true;
+        this.priorityQueueComparator = comparator;
+        return this;
+    }
+
+    public ScalingWorkerQueue withToStringFunction(Function<E, String> toStringFunction) {
+        this.toStringFunction = toStringFunction;
+        return this;
     }
 
     public ScalingWorkerQueue<E, C> withDistributedSetup(Function<E, Boolean> trylockFunction, Consumer<E> unlockFunction, Function<E, Boolean> integrityCheckFunction) {
@@ -111,13 +137,14 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
         return this;
     }
 
-    public ScalingWorkerQueue<E, C> withRunnersMonitoring(Consumer<Collection> consumer) {
-        consumer.accept(runners);
-        return this;
-    }
-
     protected void executeEventListener(ListenerEvent listenerEvent, E element) {
         eventListenerMap.getOrDefault(listenerEvent, Consumers.noBiOp()).accept(dispatcherThreadId, element);
+    }
+
+    public ScalingWorkerQueue<E, C> withRunnersMonitoring(Consumer<Collection> consumer) {
+        assertStatusCreated();
+        consumer.accept(runners);
+        return this;
     }
 
     private void assertStatusCreated() {
@@ -181,16 +208,27 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
             long sleepPeriod = configuration.getSleepPeriod();
             int sleepPeriodCountOnError = configuration.getSleepPeriodCountOnError();
 
-            Long idleWaitUntil, addedCount;
+            if (usePriorityQueue) {
+                if (priorityQueueComparator != null) {
+                    internalQueue = new PriorityBlockingQueue<>(minElementsCountToSupply, priorityQueueComparator);
+                } else {
+                    internalQueue = new PriorityBlockingQueue<>();
+                }
+            } else {
+                internalQueue = new ConcurrentLinkedQueue<>();
+            }
+
+            Long idleWaitUntil;
+            long addedCount;
 
             while (!shouldStop()) {
                 try {
                     // Get elements by supplying function
-                    LOG.trace("Fetching additional elements");
                     int maxFetchCount = Math.max(minElementsCountToSupply, elementsPerRunner * runners.size() + spareElementCount);
+                    LOG.trace("Fetching additional elements (max: {})", maxFetchCount);
                     Collection<E> elements = supplier.apply(maxFetchCount);
                     if (elements.size() > 0) {
-                        LOG.debug("Fetched {} additional elements", elements.size());
+                        LOG.debug("Fetched {} (of max {}) additional elements", elements.size(), maxFetchCount);
                         if (elements.size() > maxFetchCount) {
                             LOG.warn("Fetching more elements than wanted: {} > {}.", elements.size(), maxFetchCount);
                         }
@@ -206,12 +244,12 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
                     // (This does not have a good performance for larger queues, but we should not have them.)
                     for (E element : elements) {
                         if (!internalQueue.contains(element) && !elementsInWork.contains(element)) {
-                            LOG.trace("Adding fetched element to internal queue: {}", element);
+                            LOG.trace("Adding fetched element to internal queue: {}", toStringFunction.apply(element));
                             internalQueue.add(element);
                             executeEventListener(ListenerEvent.ADDED_TO_QUEUE, element);
                             addedCount++;
                         } else {
-                            LOG.debug("Skipping fetched element. It is already in the internal queue or currently processed: {}", element);
+                            LOG.debug("Skipping fetched element. It is already in the internal queue or currently processed: {}", toStringFunction.apply(element));
                         }
                     }
                     // If no (new) elements are added to the internal queue, we sleep some time ...
@@ -310,14 +348,14 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
                     // Process element
                     if (optionalElement.isPresent()) {
                         E element = optionalElement.get();
-                        LOG.info("Got next: {}", element);
+                        LOG.info("Got next element: {}", toStringFunction.apply(element));
                         try {
                             noResultStartTime = null;   // Reset idle counter (in case of no result)
                             if (trylockFunction.apply(element) && integrityCheckFunction.apply(element)) {
                                 try {
                                     worker.accept(element, configuration);
                                 } catch (Throwable throwable) {
-                                    LOG.error("Caught exception while processing element: {}", asShortString(throwable), throwable);
+                                    LOG.error("Caught exception while processing element '{}': {}", toStringFunction.apply(element), asShortString(throwable), throwable);
                                 } finally {
                                     unlockFunction.accept(element);
                                 }

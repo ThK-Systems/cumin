@@ -41,13 +41,17 @@ Browse the [Javadoc of the latest version](http://www.thk-systems.de/content/oss
 <dependency>
   <groupId>net.thk-systems.commons</groupId>
   <artifactId>cumin</artifactId>
-  <version>4.0.3</version>
+  <version>4.0.4</version>
 </dependency>
 ```
-You can browse [maven-central](http://search.maven.org/#artifactdetails|net.thk-systems.commons|cumin|4.0.3|jar) to download the jar or another versions.
+You can browse [maven-central](http://search.maven.org/#artifactdetails|net.thk-systems.commons|cumin|4.0.4|jar) to download the jar or another versions.
 
 
 ## Changelog
+
+**4.0.4**
+
+* ScalingWorkerQueue: Added support for priority queue
 
 **4.0.3**
 
