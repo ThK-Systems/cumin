@@ -89,17 +89,17 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
      * With no {@link Comparator} given, E must implement {@link Comparable}.<br>
      * This requirement is not checked anywhere and may result in a runtime exception, if not fulfilled.
      */
-    public ScalingWorkerQueue withPriorityQueue() {
+    public ScalingWorkerQueue<E, C> withPriorityQueue() {
         return withPriorityQueue(null);
     }
 
-    public ScalingWorkerQueue withPriorityQueue(Comparator<E> comparator) {
+    public ScalingWorkerQueue<E, C> withPriorityQueue(Comparator<E> comparator) {
         this.usePriorityQueue = true;
         this.priorityQueueComparator = comparator;
         return this;
     }
 
-    public ScalingWorkerQueue withToStringFunction(Function<E, String> toStringFunction) {
+    public ScalingWorkerQueue<E, C> withToStringFunction(Function<E, String> toStringFunction) {
         this.toStringFunction = toStringFunction;
         return this;
     }
