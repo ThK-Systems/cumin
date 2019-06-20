@@ -26,8 +26,8 @@ public final class ExceptionUtils {
      * <p>
      * <pre>
      * n.u.l.l.GeneralWorldFailure: You need to pray
-     * -> n.e.f.OrwellException: Big Brother is watching you
-     * -> abc.xyz.GoogleStillExistsException: null
+     * -&gt; n.e.f.OrwellException: Big Brother is watching you
+     * -&gt; abc.xyz.GoogleStillExistsException: null
      * </pre>
      */
     public static String asMessageList(Throwable t) {

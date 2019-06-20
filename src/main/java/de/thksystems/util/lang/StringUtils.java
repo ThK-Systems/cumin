@@ -13,11 +13,12 @@ public final class StringUtils {
     /**
      * Extract all capitals (uppercase characters) of a string.
      * <ul>
-     * <li>"hello" -> ""</li>
-     * <li>"Hello" -> "H"</li>
-     * <li>"HelLo" -> "HL"</li>
-     * <li>"hello World. Here I am." -> "WHI"</li>
-     * <li>null -> null</li>
+     * <li>"hello" -&gt; ""</li>
+     * <li>"Hello" -&gt; "H"</li>
+     * <li>"HelLo" -&gt; "HL"</li>
+     * <li>"hello World. Here I am." -&gt; "WHI"</li>
+     * <li>null -&gt; null</li>
+     * </ul>
      */
     public static String getCapitals(String s) {
         if (s == null) {

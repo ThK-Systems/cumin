@@ -94,15 +94,15 @@ public final class ParseUtils {
      * <p>
      * Units:
      * <ul>
-     * <li>ms -> milliseconds</li>
-     * <li>s -> seconds</li>
-     * <li>m -> minutes</li>
-     * <li>h -> hours</li>
-     * <li>d -> days</li>
-     * <li>w -> weeks</li>
-     * <li>M -> months (30 days)</li>
-     * <li>y -> years (365 days)</li>
-     * <li>∞ -> {@link Long#MAX_VALUE}</li>
+     * <li>ms -&gt; milliseconds</li>
+     * <li>s -&gt; seconds</li>
+     * <li>m -&gt; minutes</li>
+     * <li>h -&gt; hours</li>
+     * <li>d -&gt; days</li>
+     * <li>w -&gt; weeks</li>
+     * <li>M -&gt; months (30 days)</li>
+     * <li>y -&gt; years (365 days)</li>
+     * <li>∞ -&gt; {@link Long#MAX_VALUE}</li>
      * </ul>
      *
      * @return duration in milliseconds
