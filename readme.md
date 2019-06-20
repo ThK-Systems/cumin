@@ -41,13 +41,19 @@ Browse the [Javadoc of the latest version](http://www.thk-systems.de/content/oss
 <dependency>
   <groupId>net.thk-systems.commons</groupId>
   <artifactId>cumin</artifactId>
-  <version>4.0.5</version>
+  <version>4.1.0</version>
 </dependency>
 ```
-You can browse [maven-central](http://search.maven.org/#artifactdetails|net.thk-systems.commons|cumin|4.0.5|jar) to download the jar or another versions.
+You can browse [maven-central](http://search.maven.org/#artifactdetails|net.thk-systems.commons|cumin|4.1.0|jar) to download the jar or another versions.
 
 
 ## Changelog
+
+**4.1.0**
+
+* Updated parent pom and maven dependencies
+* ScalingWorkerQueue: Add custom toStringFunction
+* Removed UnsafeUtils
 
 **4.0.5**
 
@@ -78,27 +84,33 @@ You can browse [maven-central](http://search.maven.org/#artifactdetails|net.thk-
 * Updated parent pom
 
 **3.13.5**
+
 * Added Consumers.noBiOp
 * Added thread id of dispatch to event listener of ScalingWorkerQueue
 * Bugfixes
 
 **3.13.4**
+
 * Bugfixes
 
 **3.13.3**
+
 * Added event listener to ScalingWorkerQueue
 * Optimized logging
 * Bugfixes
 
 **3.13.2**
+
 * Optimized logging
 * Bugfixes
 
 **3.13.1**
+
 * Make ParseUtils.* nullsafe
 * Bugfixes
  
 **3.13.0**
+
 * Added ScalingWorkerQueue
 * Added ThreadUtils
 * Added IOUtils.closeQuietly
