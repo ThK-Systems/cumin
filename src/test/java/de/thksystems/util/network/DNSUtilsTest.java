@@ -16,7 +16,7 @@ public class DNSUtilsTest {
 
 	@Test
 	public void testIsMatchingIpAddress() {
-		assertTrue(DNSUtils.isMatchingIpAddress("www.thk-systems.de", "81.169.229.223"));
+		assertTrue(DNSUtils.isMatchingIpAddress("www.thk-systems.de", "45.132.245.22"));
 		assertFalse(DNSUtils.isMatchingIpAddress("www.google.com", "10.10.10.10"));
 	}
 }
