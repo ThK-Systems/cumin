@@ -36,6 +36,10 @@ public class ParseUtilsTest {
         assertEquals(1000 * 60 * 60 * 3L, ParseUtils.parseDuration("3h ").longValue());
         assertEquals(1000 * 60 * 60 * 24L, ParseUtils.parseDuration("1d").longValue());
 
+        assertEquals(-35L, ParseUtils.parseDuration("-35").longValue());
+        assertEquals(1000 * 60 * 60 * -4L, ParseUtils.parseDuration("-4h ").longValue());
+        assertEquals(-3_500L, ParseUtils.parseDuration("-3.5s").longValue());
+
         assertEquals(1000 * 60 * 3L + 55 * 1000L, ParseUtils.parseDuration("3m 55s").longValue());
         assertEquals(1000 * 60 * 3L + 55 * 1000L, ParseUtils.parseDuration(" 3m55s ").longValue());
         assertEquals(1000 * 60 * 60 * 4L + 7, ParseUtils.parseDuration("4h 7").longValue());

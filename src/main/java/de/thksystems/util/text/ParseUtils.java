@@ -26,7 +26,7 @@ public final class ParseUtils {
 
     private static final Pattern FILESIZE_PATTERN = Pattern.compile("^([0-9.]+)([ETGMK]B?)$", Pattern.CASE_INSENSITIVE);
 
-    private static final String DURATION_PATTERN_STRING = "([0-9.]+)(ms|s|m|h|d|w|M|y)?\\s*";
+    private static final String DURATION_PATTERN_STRING = "(-?[0-9.]+)(ms|s|m|h|d|w|M|y)?\\s*";
     private static final Pattern DURATION_PATTERN = Pattern.compile(DURATION_PATTERN_STRING);
     private static final Pattern DURATION_PATTERN_WHOLE = Pattern.compile("^(" + DURATION_PATTERN_STRING + ")+$");
 
