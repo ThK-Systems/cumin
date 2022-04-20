@@ -11,7 +11,6 @@ public class LocaleUtilsTest {
     public void testIsValidCountryCode() {
         assertFalse(LocaleUtils.isValidCountryCode("XX"));
         assertTrue(LocaleUtils.isValidCountryCode("DE"));
-        assertFalse(LocaleUtils.isValidCountryCode("IC"));
     }
 
     @Test
