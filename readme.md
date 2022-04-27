@@ -41,13 +41,17 @@ Browse the [Javadoc of the latest version](http://www.thk-systems.de/content/oss
 <dependency>
     <groupId>net.thk-systems.commons</groupId>
     <artifactId>cumin</artifactId>
-    <version>4.2.2</version>
+    <version>4.2.3</version>
 </dependency>
 ```
 
-You can browse [maven-central](http://search.maven.org/#artifactdetails|net.thk-systems.commons|cumin|4.2.2|jar) to download the jar or another versions.
+You can browse [maven-central](http://search.maven.org/#artifactdetails|net.thk-systems.commons|cumin|4.2.3|jar) to download the jar or another versions.
 
 ## Changelog
+
+**4.2.3**
+
+* Exposed pattern used by ParseUtils#parseDuration
 
 **4.2.2**
 

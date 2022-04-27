@@ -158,4 +158,11 @@ public final class ParseUtils {
         return durationFactorMap;
     }
 
+    /**
+     * Returns the duration pattern used by {@link #parseDuration(String)}
+     */
+    public static String getDurationPatternString() {
+        return DURATION_PATTERN_STRING;
+    }
+
 }
