@@ -15,7 +15,8 @@ import java.util.function.Supplier;
  * @see "Inspired by http://www.nosid.org/java8-threadsafe-lazy-initialization.html"
  */
 public final class Deferred<T> {
-    private volatile Supplier<T> resultSupplier;
+    private volatile boolean initialized = false;
+    private final Supplier<T> resultSupplier;
     private T result = null;
 
     public Deferred(Supplier<T> resultSupplier) {
@@ -23,11 +24,11 @@ public final class Deferred<T> {
     }
 
     public T get() {
-        if (resultSupplier != null) {
+        if (!initialized) {
             synchronized (this) {
-                if (resultSupplier != null) { // Double safety
+                if (!initialized) { // Double safety
                     result = resultSupplier.get();
-                    resultSupplier = null;
+                    initialized = true;
                 }
             }
         }
@@ -35,6 +36,10 @@ public final class Deferred<T> {
     }
 
     public boolean isInitialized() {
-        return resultSupplier == null;
+        return initialized;
+    }
+
+    public void invalidate() {
+        initialized = false;
     }
 }
