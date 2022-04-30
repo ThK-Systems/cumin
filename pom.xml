@@ -5,13 +5,13 @@
     <groupId>net.thk-systems.commons</groupId>
     <artifactId>cumin</artifactId>
     <packaging>jar</packaging>
-    <version>4.2.3</version>
+    <version>4.3.0</version>
     <name>cumin</name>
 
     <parent>
         <groupId>net.thk-systems</groupId>
         <artifactId>tksparent</artifactId>
-        <version>1.23.0</version>
+        <version>1.24.0</version>
     </parent>
 
     <dependencies>
