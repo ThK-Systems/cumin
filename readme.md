@@ -4,29 +4,30 @@ cumin provides some utility classes for java (standard edition):
 
 ## Overview
 
-*   **MapUtils** \- Simply creating maps
-*   **ExceptionUtils** \- Get nice mini stacktrace, check for exception types in cause hierarchy
-*   **ZipUtils** \- Write data or a string to a zip-file
-*   **ReflectionUtils** \- Some reflections helper
-*   **AnnotationUtils** \- Gets fields of a class annotated with a special annotation
-*   **ObjectUtils** \- Annotation based toString(), equals(), hashCode
-*   **LocaleUtils** \- Access locales (JDK or ICU (preferred))
-*   **StringUtils** \- Get capitals of a string
-*   **RandomStringUtils** \- Create random strings
-*   **CSVUtils** \- Reading a CSV file as a list of string-arrays
-*   **IOUtils** \- Copy a StringWriter, close a stream quietly
-*   **ParseUtils** \- Parsing file sizes (like '5.3GB', '6k') or durations (like '5s', '2.5h')
-*   **DNSUtils** \- Get domain record, check for hostname against ip-address
-*   **DomUtils** \- Manipulation DOM, DOM as string
-*   **PasswordUtils** \- Hashes for password
-*   **WrappingAtomicCounter** \- used for wrapping counter 0..1..2..3..4..5..0..1..2.. .
-*   **Locker** \- For locking arbitrary objects.
-*   **Deferred** \- For lazy initialization
-*   **NamedRunnable** \- Runnable with the ability to set the thread-name that is used while running
-*   **NamedCallable** \- Callable with the ability to set the thread-name that is used while calling
-*   **CheckedFunction**, **CheckedSupplier**, **CheckedConsumer**, **CheckedRunnable** - Functional interfaces that can throws exceptions
-*   **ThreadUtils** \- Sleep without exceptions ;)
-*   **ScalingWorkerQueue** \- A scaling worker queue
+* **MapUtils** \- Simply creating maps
+* **ExceptionUtils** \- Get nice mini stacktrace, check for exception types in cause hierarchy
+* **ZipUtils** \- Write data or a string to a zip-file
+* **ReflectionUtils** \- Some reflections helper
+* **AnnotationUtils** \- Gets fields of a class annotated with a special annotation
+* **ObjectUtils** \- Annotation based toString(), equals(), hashCode
+* **LocaleUtils** \- Access locales (JDK or ICU (preferred))
+* **StringUtils** \- Get capitals of a string
+* **RandomStringUtils** \- Create random strings
+* **CSVUtils** \- Reading a CSV file as a list of string-arrays
+* **IOUtils** \- Copy a StringWriter, close a stream quietly
+* **ParseUtils** \- Parsing file sizes (like '5.3GB', '6k') or durations (like '5s', '2.5h')
+* **DNSUtils** \- Get domain record, check for hostname against ip-address
+* **DomUtils** \- Manipulation DOM, DOM as string
+* **PasswordUtils** \- Hashes for password
+* **WrappingAtomicCounter** \- used for wrapping counter 0..1..2..3..4..5..0..1..2.. .
+* **Locker** \- For locking arbitrary objects.
+* **Deferred** \- For lazy initialization
+* **NamedRunnable** \- Runnable with the ability to set the thread-name that is used while running
+* **NamedCallable** \- Callable with the ability to set the thread-name that is used while calling
+* **CheckedFunction**, **CheckedSupplier**, **CheckedConsumer**, **CheckedRunnable** - Functional interfaces that can throws exceptions
+* **ThreadUtils** \- Sleep without exceptions ;)
+* **ScalingWorkerQueue** \- A scaling worker queue
+* **ResizableCircularAverage** \- A bounded, resizable queue of BigDecimal to get its average (and sum) of all included values.
 
 ... more to come ... 
 
@@ -38,16 +39,22 @@ Browse the [Javadoc of the latest version](http://www.thk-systems.de/content/oss
 ## Installation
 
 ```xml
+
 <dependency>
     <groupId>net.thk-systems.commons</groupId>
     <artifactId>cumin</artifactId>
-    <version>4.2.3</version>
+    <version>4.3.0</version>
 </dependency>
 ```
 
-You can browse [maven-central](http://search.maven.org/#artifactdetails|net.thk-systems.commons|cumin|4.2.3|jar) to download the jar or another versions.
+You can browse [maven-central](http://search.maven.org/#artifactdetails|net.thk-systems.commons|cumin|4.3.0|jar) to download the jar or another versions.
 
 ## Changelog
+
+**4.3.0**
+
+* Added ResizableCircularAverage
+* Added Deferred#invalidate to invalidate the cached value
 
 **4.2.3**
 
