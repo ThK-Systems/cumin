@@ -108,7 +108,7 @@ public final class Locker<T> implements LockerI<T> {
      * If the waiting time exceeds the given one, an {@link TimeoutException} is thrown.
      */
     @SuppressWarnings("unchecked")
-    protected boolean lock(T element, Optional<Long> optionalMaxWaitTime, Optional<Boolean> tryLock) throws TimeoutException {
+    private boolean lock(T element, Optional<Long> optionalMaxWaitTime, Optional<Boolean> tryLock) throws TimeoutException {
         LOG.info("Locking: {}", element);
 
         // We need a unique string (if element if of type String)
@@ -151,13 +151,13 @@ public final class Locker<T> implements LockerI<T> {
     /**
      * Add current thread to queue of waiting threads for given element.
      */
-    protected void addToThreadQueue(T element) {
+    private void addToThreadQueue(T element) {
         // Create map entry in waiting queue for element, if needed
         Queue<Thread> threadQueue = getThreadQueueForElement(element, true);
         synchronized (threadQueue) {
             // Check, if element is locked by current thread, then increase counter
             if (isHeldByCurrentThread(element)) {
-                lockCounts.merge(element, 1L, (old, inc) -> old + inc);
+                lockCounts.merge(element, 1L, Long::sum);
                 LOG.debug("Element is already locked by current thread. Increased lock count: {}", lockCounts.get(element));
             }
             // If element is not held by current thread, add it to the waiting queue.

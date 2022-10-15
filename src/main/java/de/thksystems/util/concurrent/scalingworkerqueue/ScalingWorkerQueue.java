@@ -68,7 +68,7 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
     private Consumer<E> unlockFunction = Consumers.noOp();
     private Function<E, Boolean> integrityCheckFunction = element -> true;
 
-    private Map<ListenerEvent, BiConsumer<Long, E>> eventListenerMap = new HashMap<>();
+    private final Map<ListenerEvent, BiConsumer<Long, E>> eventListenerMap = new HashMap<>();
 
     private Function<E, String> toStringFunction = Object::toString;
 
@@ -76,8 +76,8 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
     private Comparator<E> priorityQueueComparator;
 
     private Queue<E> internalQueue;
-    private Set<E> elementsInWork = ConcurrentHashMap.newKeySet();
-    private List<Runner> runners = new ArrayList<>();
+    private final Set<E> elementsInWork = ConcurrentHashMap.newKeySet();
+    private final List<Runner> runners = new ArrayList<>();
 
     public ScalingWorkerQueue(C configuration, Function<Integer, Collection<E>> supplier, BiConsumer<E, C> worker) {
         this.worker = worker;

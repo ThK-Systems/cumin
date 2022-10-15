@@ -35,7 +35,7 @@ public final class IOUtils {
             return;
         try {
             closeable.close();
-        } catch (IOException e) {
+        } catch (IOException ignored) {
         }
     }
 
