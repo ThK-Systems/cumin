@@ -46,7 +46,7 @@ public final class Deferred<T> {
     @Override
     public String toString() {
         if (!initialized) {
-            return super.toString();
+            return getClass().getSimpleName() + "[not initialized]";
         } else {
             return getClass().getSimpleName() + "[" + result.toString() + "]";
         }
