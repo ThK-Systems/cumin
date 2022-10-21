@@ -42,4 +42,13 @@ public final class Deferred<T> {
     public void invalidate() {
         initialized = false;
     }
+
+    @Override
+    public String toString() {
+        if (!initialized) {
+            return super.toString();
+        } else {
+            return getClass().getSimpleName() + "[" + result.toString() + "]";
+        }
+    }
 }

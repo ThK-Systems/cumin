@@ -14,6 +14,7 @@ cumin provides some utility classes for java (standard edition):
 * **StringUtils** \- Get capitals of a string
 * **RandomStringUtils** \- Create random strings
 * **CSVUtils** \- Reading a CSV file as a list of string-arrays
+* **MathUtils** \- Getting a logarithm arbitary with an arbitary base
 * **IOUtils** \- Copy a StringWriter, close a stream quietly
 * **ParseUtils** \- Parsing file sizes (like '5.3GB', '6k') or durations (like '5s', '2.5h')
 * **DNSUtils** \- Get domain record, check for hostname against ip-address
@@ -43,13 +44,18 @@ Browse the [Javadoc of the latest version](http://www.thk-systems.de/content/oss
 <dependency>
     <groupId>net.thk-systems.commons</groupId>
     <artifactId>cumin</artifactId>
-    <version>4.3.1</version>
+    <version>4.3.2</version>
 </dependency>
 ```
 
-You can browse [maven-central](http://search.maven.org/#artifactdetails|net.thk-systems.commons|cumin|4.3.1|jar) to download the jar or another versions.
+You can browse [maven-central](http://search.maven.org/#artifactdetails|net.thk-systems.commons|cumin|4.3.2|jar) to download the jar or another versions.
 
 ## Changelog
+
+**4.3.2**
+
+* Some (non-functional) code optimizations
+* Add custom Deferred#toString
 
 **4.3.1**
 
