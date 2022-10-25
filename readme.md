@@ -52,6 +52,10 @@ You can browse [maven-central](http://search.maven.org/#artifactdetails|net.thk-
 
 ## Changelog
 
+**4.3.3 (wip)**
+
+* Optimized Deferred#toString
+
 **4.3.2**
 
 * Some (non-functional) code optimizations
