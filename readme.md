@@ -44,19 +44,23 @@ Browse the [Javadoc of the latest version](http://www.thk-systems.de/content/oss
 <dependency>
     <groupId>net.thk-systems.commons</groupId>
     <artifactId>cumin</artifactId>
-    <version>4.3.4</version>
+    <version>4.4.0</version>
 </dependency>
 ```
 
-You can browse [maven-central](http://search.maven.org/#artifactdetails|net.thk-systems.commons|cumin|4.3.4|jar) to download the jar or another versions.
+You can browse [maven-central](http://search.maven.org/#artifactdetails|net.thk-systems.commons|cumin|4.4.0|jar) to download the jar or another versions.
 
 ## Changelog
 
-**4.3.4 **
+**4.4.0**
+
+* Fixed bugs and optimized code
+
+**4.3.4**
 
 * Updated parent pom and maven dependencies, because of CVE-2024-47554
 
-**4.3.3 **
+**4.3.3**
 
 * Optimized Deferred#toString
 * Updated parent pom and maven dependencies because of CVE-2021-37533
