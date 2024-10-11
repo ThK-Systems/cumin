@@ -243,7 +243,7 @@ public final class Locker<T> implements LockerI<T> {
     }
 
     /**
-     * Locks element, than executes given {@link Runnable} and finally unlocks element. (Execute-around-method-pattern.)
+     * Locks element, then executes given {@link Runnable} and finally unlocks element. (Execute-around-method-pattern.)
      */
     public void executeWithLock(T element, Runnable task) {
         lock(element);
@@ -285,7 +285,7 @@ public final class Locker<T> implements LockerI<T> {
     }
 
     /**
-     * Locks element, than executes given {@link Supplier}, returns its result and finally unlocks element. (Execute-around-method-pattern.)
+     * Locks element, then executes given {@link Supplier}, returns its result and finally unlocks element. (Execute-around-method-pattern.)
      */
     public <S> S executeWithLock(T element, Supplier<S> supplier) {
         lock(element);

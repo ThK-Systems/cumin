@@ -8,6 +8,7 @@
 package de.thksystems.util.collection;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public final class MapUtils {
 
@@ -17,18 +18,18 @@ public final class MapUtils {
     /**
      * Creates a {@link HashMap} of {@link String},{@link String} by reading key-value-pairs like 'key::value'.
      */
-    public static HashMap<String, String> createHashMap(String... values) {
+    public static Map<String, String> createHashMap(String... values) {
         return createHashMapWithDelimiter("::", values);
     }
 
     /**
      * Creates a {@link HashMap} of {@link String},{@link String} by reading key-value-pairs like 'key[delimiter]value'.
      */
-    public static HashMap<String, String> createHashMapWithDelimiter(String delimiter, String... values) {
+    public static Map<String, String> createHashMapWithDelimiter(String delimiter, String... values) {
         HashMap<String, String> map = new HashMap<>(values.length);
         for (String value : values) {
             String[] pair = value.split(delimiter);
-            if (pair.length != 2 || pair[0].length() == 0 || pair[1].length() == 0) {
+            if (pair.length != 2 || pair[0].isEmpty() || pair[1].isEmpty()) {
                 throw new IllegalArgumentException("Invalid key-value-pair: " + value);
             }
             if (map.containsKey(pair[0])) {

@@ -227,7 +227,7 @@ public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
                     int maxFetchCount = Math.max(minElementsCountToSupply, elementsPerRunner * runners.size() + spareElementCount);
                     LOG.trace("Fetching additional elements (max: {})", maxFetchCount);
                     Collection<E> elements = supplier.apply(maxFetchCount);
-                    if (elements.size() > 0) {
+                    if (!elements.isEmpty()) {
                         LOG.debug("Fetched {} (of max {}) additional elements", elements.size(), maxFetchCount);
                         if (elements.size() > maxFetchCount) {
                             LOG.warn("Fetching more elements than wanted: {} > {}.", elements.size(), maxFetchCount);
