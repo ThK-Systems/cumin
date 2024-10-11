@@ -36,7 +36,7 @@ public final class AnnotationUtils {
     }
 
     /**
-     * Gets all fields annotated with the given annotation (including super classes)..
+     * Gets all fields annotated with the given annotation (including super classes).
      */
     public static Field[] getFieldsAnnotatedWith(Object obj, Class<? extends Annotation> annotationClass) {
         return FieldUtils.getAllFieldsList(obj.getClass()).stream()

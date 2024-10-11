@@ -10,7 +10,7 @@ import org.apache.commons.text.RandomStringGenerator;
 
 public final class RandomStringUtils {
 
-    private static final RandomStringGenerator rsgAlphanumeric = new RandomStringGenerator.Builder().withinRange('a', 'z').withinRange('0', '9').build();
+    private static final RandomStringGenerator rsgAlphanumeric = new RandomStringGenerator.Builder().withinRange('a', 'z').withinRange('0', '9').get();
 
     private RandomStringUtils() {
     }

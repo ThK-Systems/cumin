@@ -41,7 +41,7 @@ public final class ParseUtils {
      *
      * @param filesize Size as {@link String} (KB, MB, GB, TB, EB are supported as suffixes, case-insensitive, the 'B' may be omitted; If no suffix is given, the
      *                 filesize is interpreted as bytes; Negative values are not supported.)
-     * @return size in bytes as {@link BigDecimal} (<code>null</code>, if a invalid 'filesize' is given.)
+     * @return size in bytes as {@link BigDecimal} (<code>null</code>, if an invalid 'filesize' is given.)
      */
     public static BigDecimal parseFileSize(String filesize) {
         if (filesize == null || StringUtils.isBlank(filesize)) {

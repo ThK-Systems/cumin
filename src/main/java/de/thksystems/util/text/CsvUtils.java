@@ -5,7 +5,6 @@
  */
 package de.thksystems.util.text;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -24,12 +23,12 @@ public final class CsvUtils {
     /**
      * Returns the CSV-file from the input stream as a list of string-arrays.
      */
-    public static List<String[]> getAsList(InputStream is, char separator) throws IOException {
+    public static List<String[]> getAsList(InputStream is, char separator) {
         String sepStr = String.valueOf(separator);
         List<String> lines = IOUtils.readLines(is, Charset.defaultCharset());
         List<String[]> csvList = new ArrayList<>(lines.size());
         for (String line : lines) {
-            if (line != null && line.length() > 0) {
+            if (line != null && !line.isEmpty()) {
                 csvList.add(line.split(sepStr));
             }
         }

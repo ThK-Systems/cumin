@@ -42,7 +42,7 @@ public final class DomUtils {
     private static void addNodeRecursivelyToList(Node node, List<Node> nodeList) {
         nodeList.add(node);
         NodeList children = node.getChildNodes();
-        for (int i = 0; children != null && i < children.getLength(); i++) {
+        for (int i = 0; i < children.getLength(); i++) {
             addNodeRecursivelyToList(children.item(i), nodeList);
         }
     }
@@ -97,7 +97,7 @@ public final class DomUtils {
     }
 
     /**
-     * Creates a new {@link Attr}ibute with the given name and value, adds it to the parent {@link Node} and returns it.
+     * Creates a new {@link Attr}tribute with the given name and value, adds it to the parent {@link Node} and returns it.
      */
     public static Attr createAndAddAttribute(Node parentNode, String attrName, String attrValue) {
         Document doc = getOwningDocument(parentNode);

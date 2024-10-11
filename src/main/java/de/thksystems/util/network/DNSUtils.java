@@ -86,7 +86,7 @@ public final class DNSUtils {
     public static boolean exists(String hostName) {
         for (RecordType drt : RecordType.values()) {
             List<String> result = lookup(hostName, drt);
-            if (result.size() > 0) {
+            if (!result.isEmpty()) {
                 return true;
             }
         }

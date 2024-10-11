@@ -20,9 +20,6 @@ public final class EnumUtils {
     @Deprecated
     @SafeVarargs
     public static <E> boolean match(E entry, E... list) {
-        if (list.length == 0) {
-            return false;
-        }
         for (E listEntry : list) {
             if (listEntry == entry) {
                 return true;
