@@ -5,6 +5,7 @@
  */
 package de.thksystems.util.crypto;
 
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
@@ -28,12 +29,12 @@ public final class PasswordUtils {
      * @throws NoSuchAlgorithmException Hash algorithm is not available
      */
     public static String createPasswordHash(String plainPassword, String hashAlgo) throws NoSuchAlgorithmException {
-        if (plainPassword == null || plainPassword.length() == 0) {
+        if (plainPassword == null || plainPassword.isEmpty()) {
             return null;
         }
-        MessageDigest md = MessageDigest.getInstance(DEFAULT_PASSWORD_HASHALGO);
+        MessageDigest md = MessageDigest.getInstance(hashAlgo);
         byte[] digest = md.digest(plainPassword.getBytes());
-        byte[] digestHex = new Hex("UTF-8").encode(digest);
+        byte[] digestHex = new Hex(StandardCharsets.UTF_8).encode(digest);
         return new String(digestHex);
     }
 
@@ -57,7 +58,7 @@ public final class PasswordUtils {
      */
     @Deprecated
     public static String encryptAsPassword(String password) {
-        if (password == null || password.length() == 0) {
+        if (password == null || password.isEmpty()) {
             return null;
         }
         try {
