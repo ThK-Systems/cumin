@@ -35,6 +35,16 @@ import org.slf4j.LoggerFactory;
 import de.thksystems.util.concurrent.Consumers;
 import de.thksystems.util.concurrent.ThreadUtils;
 
+/**
+ * The ScalingWorkerQueue is a scalable, multi-threaded worker queue that supports dynamic
+ * scaling of worker threads based on the configuration provided. It allows the user to
+ * define custom behavior for several key functionalities, including how items are provided
+ * to the queue, how items are processed, and how threads behave.
+ *
+ * @param <E> The type of elements to be processed by the queue.
+ * @param <C> The type of configuration used to configure this queue,
+ *            extending WorkerQueueConfiguration.
+ */
 public class ScalingWorkerQueue<E, C extends WorkerQueueConfiguration> {
 
     public enum ListenerEvent {
